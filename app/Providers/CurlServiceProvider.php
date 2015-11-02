@@ -3,9 +3,9 @@
 namespace AdFinder\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use AdFinder\Helpers\DuplitronMatcher;
+use AdFinder\Helpers\CurlHttp;
 
-class MatcherServiceProvider extends ServiceProvider
+class CurlServiceProvider extends ServiceProvider
 {
 
     // Set it so this class will only be loaded when necessary
@@ -18,6 +18,7 @@ class MatcherServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        //
     }
 
     /**
@@ -27,8 +28,8 @@ class MatcherServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('AdFinder\Helpers\Contracts\MatcherContract', function(){
-            return new DuplitronMatcher($this->app['AdFinder\Helpers\Contracts\HttpContract']);
+        $this->app->bind('AdFinder\Helpers\Contracts\HttpContract', function(){
+            return new CurlHttp();
         });
     }
 
@@ -39,6 +40,6 @@ class MatcherServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return ['AdFinder\Helpers\Contracts\MatcherContract'];
+        return ['AdFinder\Helpers\Contracts\HttpContract'];
     }
 }

@@ -25,3 +25,6 @@ Route::get('/logs', function () {
 Route::get('/potential_targets', function () {
 
 });
+
+// Run the matching algorithm
+Route::get('/matcher', 'DuplitronController@runMatchJob');

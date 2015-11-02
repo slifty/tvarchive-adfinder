@@ -4,6 +4,18 @@ namespace AdFinder\Helpers\Contracts;
 
 interface MatcherContract
 {
+
+    // Task Types
+    const TASK_MATCH = "match";
+    const TASK_ADD_CORPUS = "corpus_add";
+    const TASK_ADD_POTENTIAL_TARGET = "potential_target_add";
+
+    // Match Types
+    const MEDIA_CORPUS = "corpus";
+    const MEDIA_DISTRACTOR = "distractor";
+    const MEDIA_POTENTIAL_TARGET = "potential_target";
+    const MEDIA_TARGET = "target";
+
     /**
      * Add a new piece of media to the system
      * @param string $path the network path to the media

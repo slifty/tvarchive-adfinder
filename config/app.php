@@ -144,6 +144,8 @@ return [
         AdFinder\Providers\AuthServiceProvider::class,
         AdFinder\Providers\EventServiceProvider::class,
         AdFinder\Providers\RouteServiceProvider::class,
+        AdFinder\Providers\MatcherServiceProvider::class,
+        AdFinder\Providers\CurlServiceProvider::class,
 
     ],
 
