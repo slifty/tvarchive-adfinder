@@ -1,0 +1,5 @@
+suites:
+    main:
+        namespace: AdFinder
+        psr4_prefix: AdFinder
+        src_path: app

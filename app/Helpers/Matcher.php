@@ -1,9 +1,13 @@
 <?php
 
-class Duplitron
+namespace AdFinder\Helpers;
+
+use AdFinder\Helpers\Contracts\MatcherContract;
+
+class DuplitronMatcher implements MatcherContract
 {
 
-    // TODO: move these to a .env
+     // TODO: move these to a .env
     const API_URL = "http://localhost/tvarchive-fingerprinting/public/api";
     const PROJECT_ID = 1;
     const API_TIMEOUT = 1;
@@ -13,6 +17,11 @@ class Duplitron
     const TASK_ADD_CORPUS = "corpus_add";
     const TASK_ADD_POTENTIAL_TARGET = "potential_target_add";
 
+    // Match Types
+    const MEDIA_CORPUS = "corpus";
+    const MEDIA_DISTRACTOR = "distractor";
+    const MEDIA_POTENTIAL_TARGET = "potential_target";
+    const MEDIA_TARGET = "target";
 
     /**
      * An internal helper method created in the name of DRY
@@ -28,20 +37,15 @@ class Duplitron
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-
         // Take in the server's response
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
         // Run the CURL
         $curl_result = curl_exec($ch);
         curl_close ($ch);
-
         // Parse the result
         $result = json_decode($curl_result);
-
         return $result;
     }
-
     /**
      * An internal helper method created in the name of DRY
      * It just calls curl and processes the result
@@ -53,66 +57,74 @@ class Duplitron
         // Create the GET
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-
         // Take in the server's response
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
         // Run the CURL
         $curl_result = curl_exec($ch);
         curl_close ($ch);
-
         // Parse the result
         $result = json_decode($curl_result);
-
         return $result;
     }
 
     /**
-     * Add a new piece of media to the system
-     * @param string $path the network path to the media
+     * See contract for documentation
      */
     public function addMedia($path)
     {
         // Populate the data
         $media_api_data = [
-            "project_id" => Duplitron::PROJECT_ID,
+            "project_id" => Matcher::PROJECT_ID,
             "media_path" => $path
         ];
-        $url = Duplitron::API_URL."/media";
-
+        $url = Matcher::API_URL."/media";
         // Run the call
         $api_media = $this->curl_post($url, $media_api_data);
-
         return $api_media;
     }
 
     /**
-     * Create a subset of existing media in the system
-     * @param object $api_media the media object that the subset comes from
-     * @param double $start the start time of the media snippet
-     * @param double $duration the length of the snippet
+     * See contract for documentation
      */
     public function addMediaSubset($api_media, $start, $duration)
     {
         // Populate the data
         $media_api_data = [
-            "project_id" => Duplitron::PROJECT_ID,
+            "project_id" => Matcher::PROJECT_ID,
             "base_media_id" => $api_media->id,
             "start" => $start,
             "duration" => $duration
         ];
-        $url = Duplitron::API_URL."/media";
-
+        $url = Matcher::API_URL."/media";
         // Run the call
         $api_media = $this->curl_post($url, $media_api_data);
-
         return $api_media;
     }
 
     /**
-     * Start a matching task
-     * @param  object $api_media a media object returned by the API
-     * @param  string $type A task type (see the TYPE constants for a list of valid types)
+     * See contract for documentation
+     */
+    public function getMedia($matchType)
+    {
+        switch($matchType)
+        {
+            case Matcher::MEDIA_CORPUS:
+                break;
+            case Matcher::MEDIA_DISTRACTOR:
+                break;
+            case Matcher::MEDIA_TARGET:
+                break;
+            case Matcher::MEDIA_POTENTIAL_TARGET:
+                break;
+            default:
+                break;
+        }
+
+        return [];
+    }
+
+    /**
+     * See contract for documentation
      */
     public function startTask($api_media, $type)
     {
@@ -121,40 +133,35 @@ class Duplitron
             "media_id" => $api_media->id,
             "type" => $type
         ];
-        $url = Duplitron::API_URL."/tasks";
-
+        $url = Matcher::API_URL."/tasks";
         // Run the call
         $api_task = $this->curl_post($url, $task_api_data);
-
-        return $api_task;
-    }
-
-    public function getTask($task)
-    {
-        // Populate the data
-        $url = Duplitron::API_URL."/tasks/".$task->id;
-
-        // Run the call
-        $api_task = $this->curl_get($url);
-
         return $api_task;
     }
 
     /**
-     * Tasks are asynchronous, so this method is what makes them synchronous.
-     * Pass an existing task and it will return when the task has resolved (or if the task has timed out)
-     * @param  object $task The task that we want to complete
-     * @return object       The final value for the task
+     * See contract for documentation
+     */
+    public function getTask($task)
+    {
+        // Populate the data
+        $url = Matcher::API_URL."/tasks/".$task->id;
+        // Run the call
+        $api_task = $this->curl_get($url);
+        return $api_task;
+    }
+
+    /**
+     * See contract for documentation
      */
     public function resolveTask($task)
     {
         // Keep checking task status until it times out or is finished
         $timeout_counter = 0;
-        while($timeout_counter < Duplitron::API_TIMEOUT)
+        while($timeout_counter < Matcher::API_TIMEOUT)
         {
             sleep(1);
             $task = $this->getTask($task);
-
             // Check on the status code
             switch($task->status->code)
             {
@@ -167,13 +174,10 @@ class Duplitron
                 case -1:
                     break;
             }
-
             // Increment the timeout counter
             $timeout_counter += 1;
         }
-
         return $task;
     }
-}
 
-?>
+}
