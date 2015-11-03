@@ -35,7 +35,14 @@ interface MatcherContract
      * @param  string $matchType the category of media being retrieved
      * @return array(object)    the list of media objects
      */
-    public function getMedia($matchType);
+    public function getMediaList($match_type);
+
+    /**
+     * Get a list of media registered in the system
+     * @param  string $matchType the category of media being retrieved
+     * @return array(object)    the list of media objects
+     */
+    public function getMedia($media_id);
 
     /**
      * Start a matching task

@@ -19,13 +19,14 @@ class DuplitronMatcher implements MatcherContract
     /**
      * See contract for documentation
      */
-    public function addMedia($path)
+    public function addMedia($media)
     {
 
         // Populate the data
         $media_api_data = [
             "project_id" => env('DUPLITRON_PROJECT_ID'),
-            "media_path" => $path
+            "media_path" => $media['path'],
+            "external_id" => $media['external_id']
         ];
         $url = env('DUPLITRON_URL')."/media";
 
@@ -56,23 +57,41 @@ class DuplitronMatcher implements MatcherContract
     /**
      * See contract for documentation
      */
-    public function getMedia($matchType)
+    public function getMediaList($match_type)
     {
-        switch($matchType)
+
+        // Set up the API call to look at our project
+        $url = env('DUPLITRON_URL')."/media?project_id=".env('DUPLITRON_PROJECT_ID');
+
+        // Add any type filters
+        switch($match_type)
         {
             case DuplitronMatcher::MEDIA_CORPUS:
+                $url = $url."&matchType=corpus";
                 break;
             case DuplitronMatcher::MEDIA_DISTRACTOR:
+                $url = $url."&matchType=distractor";
                 break;
             case DuplitronMatcher::MEDIA_TARGET:
+                $url = $url."&matchType=target";
                 break;
             case DuplitronMatcher::MEDIA_POTENTIAL_TARGET:
+                $url = $url."&matchType=potential_target";
                 break;
             default:
                 break;
         }
 
-        return [];
+        return $api_task = $this->http->get($url);
+    }
+
+    /**
+     * See contract for documentation
+     */
+    public function getMedia($media_id)
+    {
+        $url = env('DUPLITRON_URL')."/media/".$media_id;
+        return $api_task = $this->http->get($url);
     }
 
     /**

@@ -3,7 +3,9 @@
     <head>
         <title>Ad Discovery</title>
 
-        <!-- CSS And JavaScript -->
+        <script type="text/javascript" src="javascript/lib/jquery.min.js"></script>
+
+        @yield('head')
     </head>
 
     <body>

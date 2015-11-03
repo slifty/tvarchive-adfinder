@@ -3,6 +3,7 @@ namespace AdFinder\Http\Controllers;
 
 use AdFinder\Http\Controllers\Controller;
 use AdFinder\Helpers\Contracts\MatcherContract;
+use AdFinder\Helpers\Contracts\HttpContract;
 
 class DuplitronController extends Controller {
 
@@ -10,23 +11,22 @@ class DuplitronController extends Controller {
      * Get a list of new media and run them through the matcher
      * @return [type] [description]
      */
-    public function runMatchJob(MatcherContract $matcher)
+    public function runMatchJob(MatcherContract $matcher, HttpContract $http)
     {
-        $media_list = $this->getNewMedia();
+        $media_list = $this->getNewMedia($http);
 
         // Send the file to the API
         foreach($media_list as $input_media)
         {
             ///////////
             // Add the media to the API
-            $media = $matcher->addMedia($input_media['path']);
+            $media = $matcher->addMedia($input_media);
 
             // Run the match command
             $match_task = $matcher->startTask($media, MatcherContract::TASK_MATCH);
 
             // Wait for the match to finish
             $match_task = $matcher->resolveTask($match_task);
-            print_r($match_task);
 
             // Iterate through the matched segments
             $segments = $match_task->result->data->segments;
@@ -61,29 +61,26 @@ class DuplitronController extends Controller {
 
     }
 
+    public function getPotentialTargets(MatcherContract $matcher)
+    {
+        return $matcher->getMediaList(MatcherContract::MEDIA_POTENTIAL_TARGET);
+    }
+
     /**
      * Get a list of the latest media
      */
-    private function getNewMedia()
+    private function getNewMedia(HttpContract $http)
     {
-        // Load all mp3 files from the samples directory
-        // TODO: make this work with the archive, rather than a list of local files
-        $path    = storage_path().'/samples';
-        $files = scandir($path);
-        $files = array_filter($files, function($item) {
-            $ext = pathinfo($item, PATHINFO_EXTENSION);
-            if($ext == "mp3")
-                return true;
-            return false;
-        });
+        // Get a list of recent identifiers
+        $files = $http->get(env("ARCHIVE_MEDIA_API"));
 
+        // Create a media item for each file in the list
         array_walk($files, function(&$item, $key) {
             $item = [
-                "path" => "ssh://slifty@127.0.0.1/Users/slifty/Sites/tvarchive-ad_discovery/storage/samples/".$item
+                "path" => "http://archive.org/download/".$item."/format=MP3",
+                "external_id" => $item
             ];
         });
-
-        $files = array_slice($files, 0,2);
 
         return $files;
     }
