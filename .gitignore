@@ -10,3 +10,5 @@ vendor/
 !*.gitkeep
 
 *.DS_Store
+
+.env
