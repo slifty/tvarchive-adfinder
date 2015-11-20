@@ -21,7 +21,7 @@
                     data[x]['start'],
                     data[x]['duration'],
                     data[x]['created_at'],
-                    "<a href='review/" + data[x]['id'] + "'>Review</a>"
+                    "<a href='review/" + data[x]['id'] + "' target='_blank'>Review</a>"
                 ]
                 potential_targets.push(potential_target);
             }

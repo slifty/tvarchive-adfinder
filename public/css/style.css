@@ -1,0 +1,19 @@
+
+
+
+/* Review Interface */
+#isDistractor {
+	background-color: #FF9999;
+	padding: 50px;
+	display: inline-block;
+	cursor: pointer;
+}
+
+#isTarget {
+	background-color: #99FF99;
+	height: 100px;
+	width: 200px;
+	padding: 50px;
+	display: inline-block;
+	cursor: pointer;
+}

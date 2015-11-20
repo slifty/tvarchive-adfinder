@@ -28,6 +28,9 @@ class DuplitronController extends Controller {
             // Wait for the match to finish
             $match_task = $matcher->resolveTask($match_task);
 
+            if($match_task->status->code == MatcherContract::STATUS_FAIL)
+                continue;
+
             // Iterate through the matched segments
             $segments = $match_task->result->data->segments;
             foreach($segments as $segment)
@@ -67,6 +70,44 @@ class DuplitronController extends Controller {
     }
 
     /**
+     * For a given media ID, register it as a distractor and remove it from the list of potential targets
+     * @param  MatcherContract $matcher  The matcher interface we are using
+     * @param  HttpContract    $http
+     * @param  integer         $media_id The ID of the media we want to work with
+     * @return [type]                    [description]
+     */
+    public function registerDistractor(MatcherContract $matcher, HttpContract $http, $media_id)
+    {
+
+        $media = $matcher->getMedia($media_id);
+
+        print_r($media);
+
+        // Step 1: Register this as a distractor
+        $register_task = $matcher->startTask($media, MatcherContract::TASK_ADD_DISTRACTOR);
+        $register_task = $matcher->resolveTask($register_task);
+
+        // Step 2: Deregister this as a potential target
+        $deregister_task = $matcher->startTask($media, MatcherContract::TASK_REMOVE_POTENTIAL_TARGET);
+        $deregister_task = $matcher->resolveTask($deregister_task);
+
+        // Step 3: Run a match
+        $match_task = $matcher->startTask($media, MatcherContract::TASK_MATCH);
+        $match_task = $matcher->resolveTask($match_task);
+
+        // Step 4: Remove any matched media in the potential targets list
+        $potential_targets = $match_task->result->data->matches->potential_targets;
+        foreach($potential_targets as $potential_target)
+        {
+            // Deregister the potential target
+            $matched_media = $potential_target->destination_media;
+            $deregister_task = $matcher->startTask($matched_media, MatcherContract::TASK_REMOVE_POTENTIAL_TARGET);
+            $deregister_task = $matcher->resolveTask($deregister_task);
+        }
+    }
+
+
+    /**
      * Get a list of the latest media
      */
     private function getNewMedia(HttpContract $http)
@@ -84,6 +125,7 @@ class DuplitronController extends Controller {
 
         return $files;
     }
+
 
 }
 

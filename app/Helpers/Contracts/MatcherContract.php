@@ -9,12 +9,18 @@ interface MatcherContract
     const TASK_MATCH = "match";
     const TASK_ADD_CORPUS = "corpus_add";
     const TASK_ADD_POTENTIAL_TARGET = "potential_target_add";
+    const TASK_ADD_DISTRACTOR = "distractor_add";
+
+    const TASK_REMOVE_POTENTIAL_TARGET = "potential_target_remove";
 
     // Match Types
     const MEDIA_CORPUS = "corpus";
     const MEDIA_DISTRACTOR = "distractor";
     const MEDIA_POTENTIAL_TARGET = "potential_target";
     const MEDIA_TARGET = "target";
+
+    // Status Types
+    const STATUS_FAIL = -1;
 
     /**
      * Add a new piece of media to the system

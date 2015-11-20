@@ -3,7 +3,9 @@
     <head>
         <title>Ad Discovery</title>
 
-        <script type="text/javascript" src="javascript/lib/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="{{url('/')}}/css/style.css"/>
+
+        <script type="text/javascript" src="{{url('/')}}/javascript/lib/jquery.min.js"></script>
 
         @yield('head')
     </head>
