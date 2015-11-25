@@ -38,6 +38,17 @@ Route::get('/review/{media_id}', function (MatcherContract $matcher, $id) {
         'start' => $media->start]);
 });
 
+// Select canonical
+Route::get('/canonical/{media_id}', function (MatcherContract $matcher, $id) {
+
+    $media = $matcher->getMedia($id);
+    return view('canonical', [
+        'media_id' => $media->id,
+        'archive_id' => $media->external_id,
+        'end' => $media->start + $media->duration,
+        'start' => $media->start]);
+});
+
 
 ////////////////
 /// API Calls
@@ -50,3 +61,6 @@ Route::get('/api/run_matcher', 'DuplitronController@runMatchJob');
 
 // Register an item as being a distractor item
 Route::post('/api/register_distractor/{media_id}', 'DuplitronController@registerDistractor');
+
+// Get a list of matches for a media ID
+Route::get('/api/matches/{media_id}', 'DuplitronController@getMatches');

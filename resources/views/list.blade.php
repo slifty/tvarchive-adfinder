@@ -10,10 +10,15 @@
     $(function() {
         $.ajax({
             'url': 'api/potential_targets',
-            'method': 'GET'
+            'method': 'GET',
+            'dataType': 'json'
+        })
+        .always(function(a,b,c) {
+            console.log(a);
+            console.log(b);
+            console.log(c);
         })
         .done(function(data) {
-            console.log(data);
             var potential_targets = [];
             for(var x in data) {
                 potential_target = [
@@ -25,7 +30,6 @@
                 ]
                 potential_targets.push(potential_target);
             }
-
             $potential_targets = $("#potential_targets").DataTable({
                 data: potential_targets,
                 columns: [

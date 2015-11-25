@@ -27,7 +27,7 @@
 
         });
         $("#isTarget").click(function() {
-
+            window.location = "{{url('/')}}/canonical/" + media_id;
         });
     });
 </script>

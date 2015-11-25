@@ -51,6 +51,13 @@ interface MatcherContract
     public function getMedia($media_id);
 
     /**
+     * Gets a list of matches for a given media item
+     * @param  [type] $media_id [description]
+     * @return [type]           [description]
+     */
+    public function getMatches($media_id);
+
+    /**
      * Start a matching task
      * @param  object $api_media a media object returned by the API
      * @param  string $type A task type (see the TYPE constants for a list of valid types)

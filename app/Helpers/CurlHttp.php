@@ -53,9 +53,6 @@ class CurlHttp implements HttpContract
         // Parse the result
         $result = json_decode($curl_result);
 
-        if(!$result)
-            echo($curl_result);
-
         return $result;
     }
 }

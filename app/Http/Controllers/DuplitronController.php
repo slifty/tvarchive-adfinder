@@ -31,10 +31,22 @@ class DuplitronController extends Controller {
             if($match_task->status->code == MatcherContract::STATUS_FAIL)
                 continue;
 
+            // Add media to the corpus
+            $corpus_task = $matcher->startTask($media, MatcherContract::TASK_ADD_CORPUS);
+            $matcher->resolveTask($corpus_task);
+            print_r($match_task);
+
             // Iterate through the matched segments
             $segments = $match_task->result->data->segments;
             foreach($segments as $segment)
             {
+                // Cut out segments that don't fit our bounds
+                $duration = $segment->end - $segment->start;
+
+                if($duration < env('DUPLITRON_MIN_DURATION')
+                || $duration > env('DUPLITRON_MAX_DURATION'))
+                    continue;
+
                 switch($segment->type)
                 {
                     case 'distractor':
@@ -54,12 +66,14 @@ class DuplitronController extends Controller {
                         // Register the segment as a new potential target
                         $store_task = $matcher->startTask($api_media_subset, MatcherContract::TASK_ADD_POTENTIAL_TARGET);
                         $store_task = $matcher->resolveTask($store_task);
+
+                        // Run a match to populate the match data for the potential target
+                        $match_task = $matcher->startTask($api_media_subset, MatcherContract::TASK_MATCH);
+                        $match_task = $matcher->resolveTask($match_task);
+
                         break;
                 }
             }
-
-            // Add media to the corpus
-            $matcher->startTask($media, MatcherContract::TASK_ADD_CORPUS);
         }
 
     }
@@ -67,6 +81,17 @@ class DuplitronController extends Controller {
     public function getPotentialTargets(MatcherContract $matcher)
     {
         return $matcher->getMediaList(MatcherContract::MEDIA_POTENTIAL_TARGET);
+    }
+
+    public function getMatches(MatcherContract $matcher, $media_id)
+    {
+
+        // Run a match to ensure the match list is most recent
+        // $media = $matcher->getMedia($media_id);
+        // $match_task = $matcher->startTask($media, MatcherContract::TASK_MATCH);
+        // $match_task = $matcher->resolveTask($match_task);
+
+        return $matcher->getMatches($media_id);
     }
 
     /**
@@ -78,10 +103,10 @@ class DuplitronController extends Controller {
      */
     public function registerDistractor(MatcherContract $matcher, HttpContract $http, $media_id)
     {
+        // TODO: All this should be done async in the background
+        // TODO: we should support local flagging of which items are under review / being processed
 
         $media = $matcher->getMedia($media_id);
-
-        print_r($media);
 
         // Step 1: Register this as a distractor
         $register_task = $matcher->startTask($media, MatcherContract::TASK_ADD_DISTRACTOR);

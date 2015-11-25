@@ -49,6 +49,7 @@ class DuplitronMatcher implements MatcherContract
             "duration" => $duration
         ];
         $url = env('DUPLITRON_URL')."/media";
+
         // Run the call
         $api_media = $this->http->post($url, $media_api_data);
         return $api_media;
@@ -83,6 +84,15 @@ class DuplitronMatcher implements MatcherContract
         }
 
         return $api_task = $this->http->get($url);
+    }
+
+    /**
+     * See contract for documentation
+     */
+    public function getMatches($media_id)
+    {
+        $url = env('DUPLITRON_URL')."/media/".$media_id."/matches";
+        return $this->http->get($url);
     }
 
     /**
