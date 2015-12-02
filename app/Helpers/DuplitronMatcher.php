@@ -141,7 +141,7 @@ class DuplitronMatcher implements MatcherContract
     {
         // Keep checking task status until it times out or is finished
         $timeout_counter = 0;
-        while($timeout_counter < env('DUPLITRON_API_TIMEOUT'))
+        while($timeout_counter < env('DUPLITRON_API_TIMEOUT') || env('DUPLITRON_API_TIMEOUT') == 0)
         {
             sleep(1);
             $task = $this->getTask($task);

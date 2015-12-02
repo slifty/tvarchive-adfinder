@@ -1,27 +1,54 @@
-## Laravel PHP Framework
+# Ad Finder
+This works with the Duplitron API to automatically find potential ad candidates from the Internet Archive's TV archive corpus.  You need access to the corpus for this code to be useful (but could modify the IngestVideo task to use your own video!).
 
-[![Build Status](https://travis-ci.org/laravel/framework.svg)](https://travis-ci.org/laravel/framework)
-[![Total Downloads](https://poser.pugx.org/laravel/framework/d/total.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Stable Version](https://poser.pugx.org/laravel/framework/v/stable.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Unstable Version](https://poser.pugx.org/laravel/framework/v/unstable.svg)](https://packagist.org/packages/laravel/framework)
-[![License](https://poser.pugx.org/laravel/framework/license.svg)](https://packagist.org/packages/laravel/framework)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as authentication, routing, sessions, queueing, and caching.
+## Dependencies
 
-Laravel is accessible, yet powerful, providing powerful tools needed for large, robust applications. A superb inversion of control container, expressive migration system, and tightly integrated unit testing support give you the tools you need to build any application with which you are tasked.
+To run this code you need:
 
-## Official Documentation
+* PHP >= 5.5.9
+* OpenSSL PHP Extension
+* PDO PHP Extension
+* Mbstring PHP Extension
+* Tokenizer PHP Extension
+* [Composer](https://getcomposer.org/) for dependency management
+* [PSQL](http://www.postgresql.org/)
 
-Documentation for the framework can be found on the [Laravel website](http://laravel.com/docs).
+## Installing
 
-## Contributing
+1. Install [Composer](https://getcomposer.org/)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](http://laravel.com/docs/contributions).
+2. Clone this repository into a living breathing live php enabled directory mod rewrite should be enabled
 
-## Security Vulnerabilities
+3. Install composer dependencies
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+	```shell
+		cd /path/to/your/clone/here
+		composer install
+	```
 
-### License
+4. Set up a psql database
 
-The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+5. Copy .env.example to .env in the root directory, then edit it
+
+	```shell
+		cd /path/to/your/clone/here
+		cp .env.example .env
+		vi .env
+	```
+
+	* RSYNC_IDENTITY_FILE: a path to a private key that web root has 500 access to, with any media files you plan on importing
+	* FPRINT_STORE: a path to the /storage/audfprint director inside of the repository
+	* DOCKER_HOST: the location and port of the docker you set up for audfprint
+	*
+
+
+6. Install supervisor and [enable the job queue](http://laravel.com/docs/5.1/queues#running-the-queue-listener).
+
+	```shell
+		cp adfinder-worker.conf.example /etc/supervisor/conf.d/adfinder-worker.conf
+		vi /etc/supervisor/conf.d/adfinder-worker.conf
+		sudo supervisorctl reread
+		sudo supervisorctl update
+		sudo supervisorctl start adfinder-worker:*
+	```

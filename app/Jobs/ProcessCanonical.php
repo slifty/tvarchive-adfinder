@@ -12,14 +12,17 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
 
+    protected $media_id;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($media_id, $create_new)
     {
-        //
+        $this->media_id = $media_id;
+        $this->is_new = $is_new
     }
 
     /**
