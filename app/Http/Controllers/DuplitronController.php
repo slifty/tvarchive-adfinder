@@ -115,12 +115,10 @@ class DuplitronController extends Controller {
      */
     private function getOrCreateMedia($duplitron_id)
     {
-        $media = Media::where('duplitron_id', $duplitron_id)->get();
-        if($media)
-        {
-            $media = array_pop($media);
-        }
-        else
+        $media = Media::where('duplitron_id', $duplitron_id)->get()->pop();
+
+        // If the media doesn't exist, make it
+        if(!$media)
         {
             $media = new Media();
             $media->duplitron_id = $duplitron_id;

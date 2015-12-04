@@ -17,7 +17,6 @@
                 url: "{{url('/')}}/api/register_distractor/" + media_id
             })
             .done(function(d) {
-                alert(d);
                 $("body").text("You can close the window now.");
                 window.close();
             })

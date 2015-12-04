@@ -41,6 +41,12 @@ class ProcessDistractor extends Job implements SelfHandling, ShouldQueue
 
         $duplitron_media = $matcher->getMedia($this->media->duplitron_id);
 
+        // Update the media to reflect the duplitron's values
+        // TODO: this should be done when the media is created, not in this process
+        $this->media->archive_id = $duplitron_media->external_id;
+        $this->media->path = $duplitron_media->media_path;
+        $this->media->save();
+
         // Step 1: Register this as a distractor
         $register_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_ADD_DISTRACTOR);
         $register_task = $matcher->resolveTask($register_task);
