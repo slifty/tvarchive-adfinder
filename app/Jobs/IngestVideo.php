@@ -35,6 +35,10 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
      */
     public function handle(MatcherContract $matcher)
     {
+        // Mark this media as processing
+        $this->media->status = Media::STATUS_PROCESSING;
+        $this->media->save();
+
         ///////////
         // Add the media to the API
         $duplitron_media = $matcher->addMedia($this->media);
@@ -102,6 +106,7 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
             }
         }
 
+        // Mark this media as processed
         $this->media->status = Media::STATUS_STABLE;
         $this->media->save();
     }

@@ -27,7 +27,7 @@ class DuplitronController extends Controller {
             $media = new Media();
             $media->archive_id = $input_media['external_id'];
             $media->path = $input_media['path'];
-            $media->status = Media::STATUS_PROCESSING;
+            $media->status = Media::STATUS_PENDING;
             $media->process = "ingest";
             $media->save();
 
@@ -84,7 +84,7 @@ class DuplitronController extends Controller {
     {
         // Load the media with this duplitron ID
         $media = getOrCreateMedia($duplitron_id);
-        $media->status = Media::STATUS_PROCESSING;
+        $media->status = Media::STATUS_PENDING;
         $media->process = "distractor";
         $media->save();
 
@@ -102,7 +102,7 @@ class DuplitronController extends Controller {
     public function registerCanonical($media_id)
     {
         $media = getOrCreateMedia($duplitron_id);
-        $media->status = Media::STATUS_PROCESSING;
+        $media->status = Media::STATUS_PENDING;
         $media->process = "canonical";
         $media->save();
         $this->dispatch(new ProcessCanonical($media, true));
@@ -125,7 +125,6 @@ class DuplitronController extends Controller {
             $media = new Media();
             $media->duplitron_id = $duplitron_id;
         }
-        $media->status = Media::STATUS_PROCESSING;
         $media->save();
         return $media;
     }

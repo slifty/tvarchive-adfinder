@@ -8,7 +8,8 @@ class Media extends Model
 {
     const STATUS_FAILED = -1;
     const STATUS_STABLE = 0;
-    const STATUS_PROCESSING = 1;
+    const STATUS_PENDING = 1;
+    const STATUS_PROCESSING = 2;
 
     /**
      * The database table used by the model.

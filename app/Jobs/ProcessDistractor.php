@@ -35,6 +35,10 @@ class ProcessDistractor extends Job implements SelfHandling, ShouldQueue
      */
     public function handle(MatcherContract $matcher)
     {
+        // Mark this media as processing
+        $this->media->status = Media::STATUS_PROCESSING;
+        $this->media->save();
+
         $duplitron_media = $matcher->getMedia($this->media->duplitron_id);
 
         // Step 1: Register this as a distractor
@@ -59,6 +63,7 @@ class ProcessDistractor extends Job implements SelfHandling, ShouldQueue
             $deregister_task = $matcher->resolveTask($deregister_task);
         }
 
+        // Mark this media as processed
         $this->media->status = Media::STATUS_STABLE;
         $this->media->save();
     }

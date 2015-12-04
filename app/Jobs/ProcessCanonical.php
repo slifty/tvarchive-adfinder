@@ -34,6 +34,11 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
      */
     public function handle()
     {
+        // Mark this media as processing
+        $this->media->status = Media::STATUS_PROCESSING;
+        $this->media->save();
+
+        // Mark this media as processed
         $this->media->status = Media::STATUS_STABLE;
         $this->media->save();
     }
