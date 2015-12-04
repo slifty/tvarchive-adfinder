@@ -67,6 +67,13 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
         $corpus_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_ADD_CORPUS);
         $matcher->resolveTask($corpus_task);
 
+        if($corpus_task->status->code == MatcherContract::STATUS_FAILED)
+        {
+            $this->media->status = Media::STATUS_FAILED;
+            $this->media->save();
+            return;
+        }
+
         // Iterate through the matched segments
         $segments = $match_task->result->data->segments;
         foreach($segments as $segment)

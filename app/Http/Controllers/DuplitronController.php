@@ -83,7 +83,7 @@ class DuplitronController extends Controller {
     public function registerDistractor($duplitron_id)
     {
         // Load the media with this duplitron ID
-        $media = getOrCreateMedia($duplitron_id);
+        $media = $this->getOrCreateMedia($duplitron_id);
         $media->status = Media::STATUS_PENDING;
         $media->process = "distractor";
         $media->save();
@@ -101,7 +101,7 @@ class DuplitronController extends Controller {
      */
     public function registerCanonical($media_id)
     {
-        $media = getOrCreateMedia($duplitron_id);
+        $media = $this->getOrCreateMedia($duplitron_id);
         $media->status = Media::STATUS_PENDING;
         $media->process = "canonical";
         $media->save();
