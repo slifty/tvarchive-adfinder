@@ -11,6 +11,17 @@ use AdFinder\Helpers\Contracts\MatcherContract;
 |
 */
 
+
+/**
+ * REST for Task Model
+ */
+Route::resource('/api/tasks', 'TaskController');
+
+/**
+ * REST for Media Model
+ */
+Route::resource('/api/media', 'MediaController');
+
 // Home page
 Route::get('/', function () {
     return view('home');
@@ -20,6 +31,11 @@ Route::get('/', function () {
 // Logs page
 Route::get('/logs', function () {
 
+});
+
+// Admin interface
+Route::get('/admin', function () {
+    return view('admin');
 });
 
 // Review list
@@ -55,6 +71,12 @@ Route::get('/canonical/{media_id}', function (MatcherContract $matcher, $id) {
 
 // List of potential targets
 Route::get('/api/potential_targets', 'DuplitronController@getPotentialTargets');
+
+// List of active tasks
+Route::get('/api/duplitron_active_tasks', 'DuplitronController@getActiveTasks');
+
+// List of failedtasks
+Route::get('/api/duplitron_failed_tasks', 'DuplitronController@getFailedTasks');
 
 // Run the matching algorithm
 Route::get('/api/run_matcher', 'DuplitronController@runMatchJob');

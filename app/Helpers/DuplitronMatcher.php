@@ -25,8 +25,8 @@ class DuplitronMatcher implements MatcherContract
         // Populate the data
         $media_api_data = [
             "project_id" => env('DUPLITRON_PROJECT_ID'),
-            "media_path" => $media['path'],
-            "external_id" => $media['external_id']
+            "media_path" => $media->path,
+            "external_id" => $media->external_id
         ];
         $url = env('DUPLITRON_URL')."/media";
 
@@ -84,6 +84,41 @@ class DuplitronMatcher implements MatcherContract
         }
 
         return $api_task = $this->http->get($url);
+    }
+
+
+    /**
+     * See contract for documentation
+     */
+    public function getTaskList($status_type)
+    {
+
+        // Set up the API call to look at our project
+        $url = env('DUPLITRON_URL')."/tasks?project_id=".env('DUPLITRON_PROJECT_ID');
+
+        // Add any type filters
+        switch($status_type)
+        {
+            case DuplitronMatcher::STATUS_NEW:
+                $url = $url."&status=".DuplitronMatcher::STATUS_NEW;
+                break;
+            case DuplitronMatcher::STATUS_STARTING:
+                $url = $url."&status=".DuplitronMatcher::STATUS_STARTING;
+                break;
+            case DuplitronMatcher::STATUS_PROCESSING:
+                $url = $url."&status=".DuplitronMatcher::STATUS_PROCESSING;
+                break;
+            case DuplitronMatcher::STATUS_FINISHED:
+                $url = $url."&status=".DuplitronMatcher::STATUS_FINISHED;
+                break;
+            case DuplitronMatcher::STATUS_FAILED:
+                $url = $url."&status=".DuplitronMatcher::STATUS_FAILED;
+                break;
+            default:
+                break;
+        }
+
+        return $this->http->get($url);
     }
 
     /**

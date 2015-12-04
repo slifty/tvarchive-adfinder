@@ -8,6 +8,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
+use AdFinder\Media;
+
 use AdFinder\Helpers\Contracts\MatcherContract;
 
 class IngestVideo extends Job implements SelfHandling, ShouldQueue
@@ -35,24 +37,30 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
     {
         ///////////
         // Add the media to the API
-        $media = $matcher->addMedia($this->media);
+        $duplitron_media = $matcher->addMedia($this->media);
+        $this->media->duplitron_id = $duplitron_media->id;
+        $this->media->save();
 
         // Skip any media that is already in the corpus
-        if($media->match_categorization->is_corpus)
+        if($duplitron_media->match_categorization->is_corpus)
             return;
 
         // Run the match command
-        $match_task = $matcher->startTask($media, MatcherContract::TASK_MATCH);
+        $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_MATCH);
 
         // Wait for the match to finish
         $match_task = $matcher->resolveTask($match_task);
 
         // If the task failed, move along
-        if($match_task->status->code == MatcherContract::STATUS_FAIL)
+        if($match_task->status->code == MatcherContract::STATUS_FAILED)
+        {
+            $this->media->status = Media::STATUS_FAILED;
+            $this->media->save();
             return;
+        }
 
         // Add media to the corpus
-        $corpus_task = $matcher->startTask($media, MatcherContract::TASK_ADD_CORPUS);
+        $corpus_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_ADD_CORPUS);
         $matcher->resolveTask($corpus_task);
 
         // Iterate through the matched segments
@@ -80,7 +88,7 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
                     break;
                 case 'corpus':
                     // Create a new media segment for the corpus match
-                    $api_media_subset = $matcher->addMediaSubset($media, $segment->start, $segment->end - $segment->start);
+                    $api_media_subset = $matcher->addMediaSubset($duplitron_media, $segment->start, $segment->end - $segment->start);
 
                     // Register the segment as a new potential target
                     $store_task = $matcher->startTask($api_media_subset, MatcherContract::TASK_ADD_POTENTIAL_TARGET);
@@ -93,5 +101,20 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
                     break;
             }
         }
+
+        $this->media->status = Media::STATUS_STABLE;
+        $this->media->save();
+    }
+
+    /**
+     * Handle a job failure.
+     *
+     * @return void
+     */
+    public function failed()
+    {
+        // Called when the job is failing...
+        $this->media->status = Media::STATUS_FAILED;
+        $this->media->save();
     }
 }

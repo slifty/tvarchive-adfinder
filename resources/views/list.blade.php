@@ -13,11 +13,6 @@
             'method': 'GET',
             'dataType': 'json'
         })
-        .always(function(a,b,c) {
-            console.log(a);
-            console.log(b);
-            console.log(c);
-        })
         .done(function(data) {
             var potential_targets = [];
             for(var x in data) {

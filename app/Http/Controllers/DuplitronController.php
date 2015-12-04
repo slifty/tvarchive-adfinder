@@ -5,6 +5,8 @@ use AdFinder\Http\Controllers\Controller;
 use AdFinder\Helpers\Contracts\MatcherContract;
 use AdFinder\Helpers\Contracts\HttpContract;
 
+use AdFinder\Media;
+
 use AdFinder\Jobs\IngestVideo;
 use AdFinder\Jobs\ProcessDistractor;
 
@@ -21,8 +23,16 @@ class DuplitronController extends Controller {
         // Create an ingestion job for each item
         foreach($media_list as $input_media)
         {
+            // Create a new media item for each item
+            $media = new Media();
+            $media->archive_id = $input_media['external_id'];
+            $media->path = $input_media['path'];
+            $media->status = Media::STATUS_PROCESSING;
+            $media->process = "ingest";
+            $media->save();
+
             // Dispatch the new job
-            $this->dispatch(new IngestVideo($input_media));
+            $this->dispatch(new IngestVideo($media));
         }
 
         // Return the list of media
@@ -32,6 +42,24 @@ class DuplitronController extends Controller {
     public function getPotentialTargets(MatcherContract $matcher)
     {
         return $matcher->getMediaList(MatcherContract::MEDIA_POTENTIAL_TARGET);
+    }
+
+    public function getActiveTasks(MatcherContract $matcher)
+    {
+        $tasks = array_merge(
+            $matcher->getTaskList(MatcherContract::STATUS_NEW),
+            $matcher->getTaskList(MatcherContract::STATUS_STARTING),
+            $matcher->getTaskList(MatcherContract::STATUS_PROCESSING)
+        );
+        return $tasks;
+    }
+
+    public function getFailedTasks(MatcherContract $matcher)
+    {
+        $tasks = array_merge(
+            $matcher->getTaskList(MatcherContract::STATUS_FAILED)
+        );
+        return $tasks;
     }
 
     public function getMatches(MatcherContract $matcher, $media_id)
@@ -52,10 +80,15 @@ class DuplitronController extends Controller {
      * @param  integer         $media_id The ID of the media we want to work with
      * @return [type]                    [description]
      */
-    public function registerDistractor($media_id)
+    public function registerDistractor($duplitron_id)
     {
-        // TODO: we should support local flagging of which items are under review / being processed
-        $this->dispatch(new ProcessDistractor($media_id));
+        // Load the media with this duplitron ID
+        $media = getOrCreateMedia($duplitron_id);
+        $media->status = Media::STATUS_PROCESSING;
+        $media->process = "distractor";
+        $media->save();
+
+        $this->dispatch(new ProcessDistractor($media));
     }
 
 
@@ -68,8 +101,33 @@ class DuplitronController extends Controller {
      */
     public function registerCanonical($media_id)
     {
-        // TODO: we should support local flagging of which items are under review / being processed
-        $this->dispatch(new ProcessCanonical($media_id, true));
+        $media = getOrCreateMedia($duplitron_id);
+        $media->status = Media::STATUS_PROCESSING;
+        $media->process = "canonical";
+        $media->save();
+        $this->dispatch(new ProcessCanonical($media, true));
+    }
+
+    /**
+     * Finds (or creates) media object from a duplitron ID
+     * @param  [type] $duplitron_id [description]
+     * @return [type]               [description]
+     */
+    private function getOrCreateMedia($duplitron_id)
+    {
+        $media = Media::where('duplitron_id', $duplitron_id)->get();
+        if($media)
+        {
+            $media = array_pop($media);
+        }
+        else
+        {
+            $media = new Media();
+            $media->duplitron_id = $duplitron_id;
+        }
+        $media->status = Media::STATUS_PROCESSING;
+        $media->save();
+        return $media;
     }
 
 

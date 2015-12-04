@@ -20,7 +20,11 @@ interface MatcherContract
     const MEDIA_TARGET = "target";
 
     // Status Types
-    const STATUS_FAIL = -1;
+    const STATUS_NEW = 0;
+    const STATUS_STARTING = 1;
+    const STATUS_PROCESSING = 2;
+    const STATUS_FINISHED = 3;
+    const STATUS_FAILED = -1;
 
     /**
      * Add a new piece of media to the system
@@ -48,6 +52,13 @@ interface MatcherContract
      * @param  string $matchType the category of media being retrieved
      * @return array(object)    the list of media objects
      */
+    public function getTaskList($task_status);
+
+    /**
+     * Get a list of media registered in the system
+     * @param  string $matchType the category of media being retrieved
+     * @return array(object)    the list of media objects
+     */
     public function getMedia($media_id);
 
     /**
@@ -63,7 +74,6 @@ interface MatcherContract
      * @param  string $type A task type (see the TYPE constants for a list of valid types)
      */
     public function startTask($api_media, $type);
-
 
     /**
      * Get a task that has already been created
