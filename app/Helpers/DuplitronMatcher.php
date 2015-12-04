@@ -189,7 +189,8 @@ class DuplitronMatcher implements MatcherContract
                 case 3: // Finished
                     return $task;
                     break;
-                case -1:
+                case -1: // Errored
+                    return $task;
                     break;
             }
             // Increment the timeout counter
