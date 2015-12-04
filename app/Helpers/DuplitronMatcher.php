@@ -26,7 +26,7 @@ class DuplitronMatcher implements MatcherContract
         $media_api_data = [
             "project_id" => env('DUPLITRON_PROJECT_ID'),
             "media_path" => $media->path,
-            "external_id" => $media->external_id
+            "external_id" => $media->archive_id
         ];
         $url = env('DUPLITRON_URL')."/media";
 
