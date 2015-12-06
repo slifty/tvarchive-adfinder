@@ -23,7 +23,11 @@ class DuplitronController extends Controller {
         // Create an ingestion job for each item
         foreach($media_list as $input_media)
         {
-            // Create a new media item for each item
+            // Skip items that have already been processed
+            if($this->isAlreadyProcessed($input_media['external_id']))
+                continue;
+
+            // Create a new media item for new items
             $media = new Media();
             $media->archive_id = $input_media['external_id'];
             $media->path = $input_media['path'];
@@ -125,6 +129,21 @@ class DuplitronController extends Controller {
         }
         $media->save();
         return $media;
+    }
+
+    /**
+     * Finds (or creates) media object from a duplitron ID
+     * @param  [type] $duplitron_id [description]
+     * @return [type]               [description]
+     */
+    private function isAlreadyProcessed($archive_id)
+    {
+        $media = Media::where('archive_id', $archive_id)->get()->pop();
+
+        // If the media doesn't exist, return false
+        if(!$media)
+            return false;
+        return true;
     }
 
 
