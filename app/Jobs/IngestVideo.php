@@ -98,6 +98,7 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
                     // TODO: send this registration call to an archive API endpoint
                     break;
                 case 'corpus':
+                    // TODO: this ought to be handled in a separate job
                     // Create a new media segment for the corpus match
                     $api_media_subset = $matcher->addMediaSubset($duplitron_media, $segment->start, $segment->end - $segment->start);
 
