@@ -45,7 +45,32 @@ class DuplitronController extends Controller {
 
     public function getPotentialTargets(MatcherContract $matcher)
     {
-        return $matcher->getMediaList(MatcherContract::MEDIA_POTENTIAL_TARGET);
+        $potential_targets = $matcher->getMediaList(MatcherContract::MEDIA_POTENTIAL_TARGET);
+
+        // Get a list of media being processed
+        $results = Media::query();
+        $results = $results->where('status', Media::STATUS_PENDING)
+            ->orWhere('status', Media::STATUS_PROCESSING);
+        $media = $results->get()->toArray();
+
+        // Extract the id's from the media
+        $processing_ids = array_map(
+            function($result)
+            {
+                return $result['duplitron_id'];
+            },
+            $media
+        );
+
+        // Remove any potential targets being processed
+        $final_targets = array();
+        foreach($potential_targets as $potential_target)
+        {
+            if(in_array($potential_target->id, $processing_ids))
+                continue;
+            $final_targets[] = $potential_target;
+        }
+        return $final_targets;
     }
 
     public function getActiveTasks(MatcherContract $matcher)

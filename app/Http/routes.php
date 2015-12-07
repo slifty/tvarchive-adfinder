@@ -11,12 +11,6 @@ use AdFinder\Helpers\Contracts\MatcherContract;
 |
 */
 
-
-/**
- * REST for Task Model
- */
-Route::resource('/api/tasks', 'TaskController');
-
 /**
  * REST for Media Model
  */

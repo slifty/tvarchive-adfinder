@@ -18,8 +18,29 @@ class MediaController extends Controller
      */
     public function index(Request $request)
     {
-        $results = Media::all();
-        return $results->toJson();
+        $results = Media::query();
+
+        // Filter by status
+        if($request->has('status'))
+        {
+            switch($request->input('status'))
+            {
+                case Media::STATUS_FAILED:
+                    $results = $results->where('status', Media::STATUS_FAILED);
+                    break;
+                case Media::STATUS_STABLE:
+                    $results = $results->where('status', Media::STATUS_STABLE);
+                    break;
+                case Media::STATUS_PENDING:
+                    $results = $results->where('status', Media::STATUS_PENDING);
+                    break;
+                case Media::STATUS_PROCESSING:
+                    $results = $results->where('status', Media::STATUS_PROCESSING);
+                    break;
+            }
+        }
+
+        return $results->get();
     }
 
     /**

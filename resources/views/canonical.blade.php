@@ -35,7 +35,7 @@
                 var archive_id = "";
 
                 // Use the source / destination that DOESNT match
-                // if(clip['source_id'] == media_id) {
+                if(clip['source_id'] == media_id) {
                     console.log("DEST")
                     archive_id = clip['destination']['external_id'];
                     start = parseFloat(clip['destination_start']) + parseFloat(clip['destination']['start']);
@@ -43,8 +43,8 @@
                     $clip = generateClip(archive_id, start, end);
                     $canonicals.append($clip);
                     $canonicals.append("<br>");
-                // }
-                // else {
+                }
+                else {
                     console.log("SOURCE");
                     archive_id = clip['source']['external_id'];
                     start = parseFloat(clip['source_start']) + parseFloat(clip['source']['start']);
@@ -52,7 +52,7 @@
                     $clip = generateClip(archive_id, start, end);
                     $canonicals.append($clip);
                     $canonicals.append("<hr>");
-               // }
+               }
             }
         })
     });

@@ -33,9 +33,10 @@
                     { title: "Duration" },
                     { title: "Created" },
                     { title: "" }
-                ]
+                ],
+                iDisplayLength: 100
             } );
-        })
+        });
     });
 </script>
 
