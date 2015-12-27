@@ -72,6 +72,9 @@ class ProcessDistractor extends Job implements SelfHandling, ShouldQueue
         // Mark this media as processed
         $this->media->status = Media::STATUS_STABLE;
         $this->media->save();
+
+        // Delete the job from the queue
+        $this->delete();
     }
 
     /**
@@ -84,5 +87,8 @@ class ProcessDistractor extends Job implements SelfHandling, ShouldQueue
         // Called when the job is failing...
         $this->media->status = Media::STATUS_FAILED;
         $this->media->save();
+
+        // Delete the job from the queue
+        $this->delete();
     }
 }
