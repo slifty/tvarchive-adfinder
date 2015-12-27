@@ -212,6 +212,10 @@ class DuplitronController extends Controller {
     {
         // Get a list of recent identifiers
         $files = $http->get(env("ARCHIVE_API_HOST")."/details/tv?weeknews=1&output=json");
+
+        // TEMP TEST CODE
+        //$files = ['WMUR_20151013_030000_News_9_Tonight'];
+
         $files = $this->packageMediaForIngestion($files);
         return $files;
     }
@@ -236,6 +240,9 @@ class DuplitronController extends Controller {
               $ads[] = $facet;
             }
         }
+
+        // TEMP TEST CODE
+        //$ads = ['PolAd_HillaryClinton_psr4d'];
 
         $ads = $this->packageMediaForIngestion($ads);
         return $ads;

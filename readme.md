@@ -52,3 +52,6 @@ To run this code you need:
 		sudo supervisorctl update
 		sudo supervisorctl start adfinder-worker:*
 	```
+
+
+(ssh -fN -o"ControlPath none" -L 9999:tv-se.archive.org:8983 vm-home1.archive.org)
