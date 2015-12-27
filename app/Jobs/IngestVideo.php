@@ -94,10 +94,10 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
                     // Skip potential targets
                     break;
                 case 'target':
-                    // Register target match with the archive
-                    // TODO: send this registration call to an archive API endpoint
+                    // We care about these segments, but register them in the matches loop
                     break;
                 case 'corpus':
+
                     // TODO: this ought to be handled in a separate job
                     // Create a new media segment for the corpus match
                     $api_media_subset = $matcher->addMediaSubset($duplitron_media, $segment->start, $segment->end - $segment->start);
@@ -112,6 +112,18 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
 
                     break;
             }
+        }
+
+        // Iterate through the target matches and register them
+        $targets = $match_task->result->data->matches->targets;
+        foreach($targets as $target)
+        {
+            $start = $target->start;
+            $end = $target->start + $target->duration;
+            $instance_id = $this->media->archive_id;
+            $canonical_id = $target->destination_media->external_id;
+            $matcher->registerCanonicalInstance($canonical_id, $instance_id, $start, $end);
+
         }
 
         // Mark this media as processed

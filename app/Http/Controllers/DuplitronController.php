@@ -8,9 +8,41 @@ use AdFinder\Helpers\Contracts\HttpContract;
 use AdFinder\Media;
 
 use AdFinder\Jobs\IngestVideo;
+use AdFinder\Jobs\ProcessCanonical;
 use AdFinder\Jobs\ProcessDistractor;
 
 class DuplitronController extends Controller {
+
+    /**
+     * Get a list of new canonical ads and add them as targets through the matcher
+     * @param  MatcherContract $matcher [description]
+     * @param  HttpContract    $http    [description]
+     * @return [type]                   [description]
+     */
+    public function runTargetJob(MatcherContract $matcher, HttpContract $http)
+    {
+        $ad_list = $this->getNewCanonicals($http);
+
+        // Create an ingestion job for each item
+        foreach($ad_list as $input_media)
+        {
+            // Skip items that have already been processed
+            if($this->isAlreadyProcessed($input_media['external_id']))
+                continue;
+
+            // Create a new media item for new items
+            $media = new Media();
+            $media->archive_id = $input_media['external_id'];
+            $media->media_path = $input_media['media_path'];
+            $media->afpt_path = $input_media['afpt_path'];
+            $media->status = Media::STATUS_PENDING;
+            $media->process = "canonical";
+            $media->save();
+
+            // Dispatch the new job
+            $this->dispatch(new ProcessCanonical($media));
+        }
+    }
 
     /**
      * Get a list of new media and run them through the matcher
@@ -30,9 +62,10 @@ class DuplitronController extends Controller {
             // Create a new media item for new items
             $media = new Media();
             $media->archive_id = $input_media['external_id'];
-            $media->path = $input_media['path'];
+            $media->media_path = $input_media['media_path'];
+            $media->afpt_path = $input_media['afpt_path'];
             $media->status = Media::STATUS_PENDING;
-            $media->process = "ingest";
+            $media->process = "canonical";
             $media->save();
 
             // Dispatch the new job
@@ -128,7 +161,7 @@ class DuplitronController extends Controller {
      * @param  integer         $media_id The ID of the media we want to work with
      * @return [type]                    [description]
      */
-    public function registerCanonical($media_id)
+    public function registerCanonical($duplitron_id)
     {
         $media = $this->getOrCreateMedia($duplitron_id);
         $media->status = Media::STATUS_PENDING;
@@ -178,20 +211,54 @@ class DuplitronController extends Controller {
     private function getNewMedia(HttpContract $http)
     {
         // Get a list of recent identifiers
-        $files = $http->get(env("ARCHIVE_MEDIA_API"));
+        $files = $http->get(env("ARCHIVE_API_HOST")."/details/tv?weeknews=1&output=json");
+        $files = $this->packageMediaForIngestion($files);
+        return $files;
+    }
+
+
+    /**
+     * Get a list of the latest media
+     */
+    private function getNewCanonicals(HttpContract $http)
+    {
+        // Get a list of ad instances from the archive
+        // TODO: this should be done completely differently (ideally with a designated endpoint, not a random solr search)
+        $url = env('ARCHIVE_SEARCH_HOST').'/solr/select?indent=yes&omitHeader=true&wt=json&&q=*%3A*&rows=0&facet=on&facet.field=ad_id';
+        $result = $http->get($url);
+
+        // The result has a list of ad ids and counts
+        $facets = $result->facet_counts->facet_fields->ad_id;
+        $ads = array();
+        foreach($facets as $facet) {
+            // is this NOT a count?
+            if(!is_numeric($facet)) {
+              $ads[] = $facet;
+            }
+        }
+
+        $ads = $this->packageMediaForIngestion($ads);
+        return $ads;
+    }
+
+    /**
+     * Take a list of archive ID strings and convert them to full objects
+     * @param  array $files A list of archive identifiers (strings)
+     * @return array        A list of media objects
+     */
+    private function packageMediaForIngestion($files) {
 
         // Create a media item for each file in the list
         array_walk($files, function(&$item, $key) {
             $item = [
-                "path" => "http://archive.org/download/".$item."/format=MP3",
+                "media_path" => "http://archive.org/download/".$item."/format=MP3",
+                "afpt_path" => "http://archive.org/compress/".$item."/formats=COLUMBIA%20FINGERPRINT%20TV&file=/".$item.".zip",
                 "external_id" => $item
             ];
         });
 
         return $files;
     }
-
-
 }
 
 ?>

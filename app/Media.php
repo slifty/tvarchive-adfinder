@@ -28,6 +28,7 @@ class Media extends Model
         'archive_id',
         'status',
         'process',
-        'path'
+        'media_path',
+        'fingerprint_path',
     ];
 }

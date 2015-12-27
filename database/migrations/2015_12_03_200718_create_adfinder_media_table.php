@@ -20,7 +20,8 @@ class CreateAdfinderMediaTable extends Migration
             $table->text('archive_id')->nullable();
             $table->text('status')->nullable();
             $table->text('process')->nullable();
-            $table->text('path')->nullable();
+            $table->text('media_path')->nullable();
+            $table->text('afpt_path')->nullable();
             $table->timestamps();
             $table->index(['duplitron_id']);
             $table->index(['archive_id']);

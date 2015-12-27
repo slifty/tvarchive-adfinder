@@ -10,8 +10,10 @@ interface MatcherContract
     const TASK_ADD_CORPUS = "corpus_add";
     const TASK_ADD_POTENTIAL_TARGET = "potential_target_add";
     const TASK_ADD_DISTRACTOR = "distractor_add";
+    const TASK_ADD_TARGET = "target_add";
 
     const TASK_REMOVE_POTENTIAL_TARGET = "potential_target_remove";
+    const TASK_REMOVE_DISTRACTOR = "distractor_remove";
 
     // Match Types
     const MEDIA_CORPUS = "corpus";
@@ -89,5 +91,16 @@ interface MatcherContract
      * @return object       The final value for the task
      */
     public function resolveTask($task);
+
+
+    /**
+     * Registers a copy of a political ad in the database of record
+     * @param  [type] $canonical_id [description]
+     * @param  [type] $instance_id  [description]
+     * @param  [type] $start        [description]
+     * @param  [type] $end          [description]
+     * @return [type]               [description]
+     */
+    public function registerCanonicalInstance($canonical_id, $instance_id, $start, $end);
 
 }

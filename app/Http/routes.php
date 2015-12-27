@@ -75,6 +75,9 @@ Route::get('/api/duplitron_failed_tasks', 'DuplitronController@getFailedTasks');
 // Run the matching algorithm
 Route::get('/api/run_matcher', 'DuplitronController@runMatchJob');
 
+// Run the targets algorithm
+Route::get('/api/run_targets', 'DuplitronController@runTargetJob');
+
 // Register an item as being a distractor item
 Route::post('/api/register_distractor/{media_id}', 'DuplitronController@registerDistractor');
 
