@@ -74,8 +74,11 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
             return;
         }
 
-        // Iterate through the matched segments
+        // Pull out the pieces we will care about
+        $matches = $match_task->result->data->matches;
         $segments = $match_task->result->data->segments;
+
+        // Iterate through the matched segments
         foreach($segments as $segment)
         {
             // Cut out segments that don't fit our bounds
@@ -115,7 +118,7 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
         }
 
         // Iterate through the target matches and register them
-        $targets = $match_task->result->data->matches->targets;
+        $targets = $matches->targets;
         foreach($targets as $target)
         {
             $start = $target->start;
