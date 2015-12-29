@@ -197,7 +197,8 @@ class DuplitronMatcher implements MatcherContract
             // Increment the timeout counter
             $timeout_counter += 1;
         }
-        return $task;
+
+        throw new \Exception("DUPLITRON_API_TIMEOUT exceeded");
     }
 
     /**

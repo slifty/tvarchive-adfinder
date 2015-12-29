@@ -49,6 +49,18 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
         if($duplitron_media->match_categorization->is_corpus)
             return;
 
+        // Add media to the corpus
+        // This needs to be done before matching to ensure no comparisons are missed in multithreaded environments
+        $corpus_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_ADD_CORPUS);
+        $matcher->resolveTask($corpus_task);
+
+        if($corpus_task->status->code == MatcherContract::STATUS_FAILED)
+        {
+            $this->media->status = Media::STATUS_FAILED;
+            $this->media->save();
+            return;
+        }
+
         // Run the match command
         $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_MATCH);
 
@@ -57,17 +69,6 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
 
         // If the task failed, move along
         if($match_task->status->code == MatcherContract::STATUS_FAILED)
-        {
-            $this->media->status = Media::STATUS_FAILED;
-            $this->media->save();
-            return;
-        }
-
-        // Add media to the corpus
-        $corpus_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_ADD_CORPUS);
-        $matcher->resolveTask($corpus_task);
-
-        if($corpus_task->status->code == MatcherContract::STATUS_FAILED)
         {
             $this->media->status = Media::STATUS_FAILED;
             $this->media->save();
@@ -132,9 +133,6 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
         // Mark this media as processed
         $this->media->status = Media::STATUS_STABLE;
         $this->media->save();
-
-        // Delete the job from the queue
-        $this->delete();
     }
 
     /**
@@ -147,8 +145,5 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
         // Called when the job is failing...
         $this->media->status = Media::STATUS_FAILED;
         $this->media->save();
-
-        // Delete the job from the queue
-        $this->delete();
     }
 }
