@@ -52,6 +52,12 @@ class DuplitronController extends Controller {
     {
         $media_list = $this->getNewMedia($http);
 
+        // Shuffle the media list to randomize the ingestion order
+        //  This is an optimization which should help minimize the creation of extra database parts
+        //  Since the duplitron clusters corpus files by date, and threads create additional databases
+        //  on file lock
+        shuffle($media_list);
+
         // Create an ingestion job for each item
         foreach($media_list as $input_media)
         {

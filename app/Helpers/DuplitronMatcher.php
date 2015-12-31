@@ -165,6 +165,7 @@ class DuplitronMatcher implements MatcherContract
     {
         // Populate the data
         $url = env('DUPLITRON_URL')."/tasks/".$task->id;
+
         // Run the call
         $api_task = $this->http->get($url);
         return $api_task;
