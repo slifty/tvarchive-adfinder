@@ -12,6 +12,7 @@ interface MatcherContract
     const TASK_ADD_POTENTIAL_TARGET = "potential_target_add";
     const TASK_ADD_DISTRACTOR = "distractor_add";
     const TASK_ADD_TARGET = "target_add";
+    const TASK_CLEAN = "clean";
 
     const TASK_REMOVE_POTENTIAL_TARGET = "potential_target_remove";
     const TASK_REMOVE_DISTRACTOR = "distractor_remove";

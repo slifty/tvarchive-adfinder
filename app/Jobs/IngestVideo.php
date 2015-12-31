@@ -113,7 +113,6 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
                     // Run a match to populate the match data for the potential target
                     $match_task = $matcher->startTask($api_media_subset, MatcherContract::TASK_MATCH);
                     $match_task = $matcher->resolveTask($match_task);
-
                     break;
             }
         }
@@ -129,6 +128,10 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
             $matcher->registerCanonicalInstance($canonical_id, $instance_id, $start, $end);
 
         }
+
+        // Clean up after yourself
+        $clean_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_CLEAN);
+        $clean_task = $matcher->resolveTask($clean_task);
 
         // Mark this media as processed
         $this->media->status = Media::STATUS_STABLE;
