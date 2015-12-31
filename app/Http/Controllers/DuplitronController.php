@@ -71,7 +71,7 @@ class DuplitronController extends Controller {
             $media->media_path = $input_media['media_path'];
             $media->afpt_path = $input_media['afpt_path'];
             $media->status = Media::STATUS_PENDING;
-            $media->process = "canonical";
+            $media->process = "ingest";
             $media->save();
 
             // Dispatch the new job

@@ -113,6 +113,7 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
                     // Run a match to populate the match data for the potential target
                     $match_task = $matcher->startTask($api_media_subset, MatcherContract::TASK_MATCH);
                     $match_task = $matcher->resolveTask($match_task);
+
                     break;
             }
         }
