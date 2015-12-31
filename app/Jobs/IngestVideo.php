@@ -130,8 +130,9 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
         }
 
         // Clean up after yourself
-        $clean_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_CLEAN);
-        $clean_task = $matcher->resolveTask($clean_task);
+        // Disabled temporarily...
+        // $clean_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_CLEAN);
+        // $clean_task = $matcher->resolveTask($clean_task);
 
         // Mark this media as processed
         $this->media->status = Media::STATUS_STABLE;
