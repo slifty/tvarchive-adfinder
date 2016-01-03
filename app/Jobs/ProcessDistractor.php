@@ -44,7 +44,7 @@ class ProcessDistractor extends Job implements SelfHandling, ShouldQueue
         // Update the media to reflect the duplitron's values
         // TODO: this should be done when the media is created, not in this process
         $this->media->archive_id = $duplitron_media->external_id;
-        $this->media->path = $duplitron_media->media_path;
+        $this->media->media_path = $duplitron_media->media_path;
         $this->media->save();
 
         // Step 1: Register this as a distractor
