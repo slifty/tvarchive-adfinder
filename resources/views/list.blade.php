@@ -17,6 +17,7 @@
             var potential_targets = [];
             for(var x in data) {
                 potential_target = [
+                    data[x]['id'],
                     data[x]['external_id'],
                     data[x]['start'],
                     data[x]['duration'],
@@ -28,6 +29,7 @@
             $potential_targets = $("#potential_targets").DataTable({
                 data: potential_targets,
                 columns: [
+                    { title: "DTk5 ID" },
                     { title: "Archive ID" },
                     { title: "Start" },
                     { title: "Duration" },

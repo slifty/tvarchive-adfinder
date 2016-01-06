@@ -65,6 +65,13 @@ class ProcessDistractor extends Job implements SelfHandling, ShouldQueue
         {
             // Deregister the potential target
             $matched_media = $potential_target->destination_media;
+
+            // First make sure the match is significant
+            $match_duration = $potential_target->duration;
+            $matched_media_duration = $matched_media->duration;
+            if($match_duration / $matched_media_duration < .6)
+                continue;
+
             $deregister_task = $matcher->startTask($matched_media, MatcherContract::TASK_REMOVE_POTENTIAL_TARGET);
             $deregister_task = $matcher->resolveTask($deregister_task);
         }

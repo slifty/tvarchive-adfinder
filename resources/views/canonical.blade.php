@@ -14,11 +14,6 @@
             url: "{{url('/')}}/api/matches/" + media_id,
             dataType: "json"
         })
-        .always(function(d,e,f) {
-            console.log(d);
-            console.log(e);
-            console.log(f);
-        })
         .done(function(d) {
             $canonicals = $("#canonicals");
             $canonicals.html("");
@@ -28,15 +23,18 @@
             $canonicals.append($clip);
 
             for(var x in d) {
+
                 var clip = d[x];
                 var duration = parseFloat(clip['duration']);
                 var start = 0;
                 var end = 0;
                 var archive_id = "";
-
                 // Use the source / destination that DOESNT match
                 if(clip['source_id'] == media_id) {
-                    console.log("DEST")
+                    // We only want to show corpus matches
+                    if(!clip['destination']['match_categorization']['is_corpus'])
+                        continue;
+
                     archive_id = clip['destination']['external_id'];
                     start = parseFloat(clip['destination_start']) + parseFloat(clip['destination']['start']);
                     end = start + duration;
@@ -45,7 +43,9 @@
                     $canonicals.append("<br>");
                 }
                 else {
-                    console.log("SOURCE");
+                    if(!clip['source']['match_categorization']['is_corpus'])
+                        continue;
+
                     archive_id = clip['source']['external_id'];
                     start = parseFloat(clip['source_start']) + parseFloat(clip['source']['start']);
                     end = start + duration;
@@ -58,7 +58,6 @@
     });
 
     function generateClip(archive_id, start, end) {
-        console.log(archive_id + " :: " + start + " " + end);
 
         var $clip = $("<div>")
             .addClass("clip");

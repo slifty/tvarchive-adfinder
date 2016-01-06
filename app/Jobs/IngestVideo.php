@@ -83,7 +83,7 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
         foreach($segments as $segment)
         {
             // Cut out segments that don't fit our bounds
-            $duration = $segment->end - $segment->start;
+            $duration = $segment->duration;
 
             if($duration < env('DUPLITRON_MIN_DURATION')
             || $duration > env('DUPLITRON_MAX_DURATION'))
@@ -104,7 +104,7 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
 
                     // TODO: this ought to be handled in a separate job
                     // Create a new media segment for the corpus match
-                    $api_media_subset = $matcher->addMediaSubset($duplitron_media, $segment->start, $segment->end - $segment->start);
+                    $api_media_subset = $matcher->addMediaSubset($duplitron_media, $segment->start, $segment->duration);
 
                     // Register the segment as a new potential target
                     $store_task = $matcher->startTask($api_media_subset, MatcherContract::TASK_ADD_POTENTIAL_TARGET);
