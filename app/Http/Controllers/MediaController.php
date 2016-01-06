@@ -16,7 +16,7 @@ class MediaController extends Controller
      *
      * @return Response
      */
-    public function index(Request $request)
+    public function index(Request $request, $start, $end)
     {
         $results = Media::query();
 
@@ -39,6 +39,9 @@ class MediaController extends Controller
                     break;
             }
         }
+
+        // TODO: add real pagination
+        $results = $results->take(5000);
 
         return $results->get();
     }
