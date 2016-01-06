@@ -16,7 +16,7 @@ class MediaController extends Controller
      *
      * @return Response
      */
-    public function index(Request $request, $start, $end)
+    public function index(Request $request)
     {
         $results = Media::query();
 
