@@ -243,7 +243,7 @@ class DuplitronController extends Controller {
         foreach($facets as $facet) {
             // is this NOT a count?
             if(!is_numeric($facet)) {
-              $ads[] = $facet;
+                $ads[] = $facet;
             }
         }
 
@@ -265,7 +265,7 @@ class DuplitronController extends Controller {
         array_walk($files, function(&$item, $key) {
             $item = [
                 "media_path" => "http://archive.org/download/".$item."/format=MP3",
-                "afpt_path" => "http://archive.org/compress/".$item."/formats=COLUMBIA%20FINGERPRINT%20TV&file=/".$item.".zip",
+                "afpt_path" => "http://archive.org/compress/".$item."/formats=COLUMBIA%20SPARSE%20FINGERPRINT%20TV&file=/".$item.".zip",
                 "external_id" => $item
             ];
         });
