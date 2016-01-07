@@ -114,6 +114,41 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
                     $match_task = $matcher->startTask($api_media_subset, MatcherContract::TASK_MATCH);
                     $match_task = $matcher->resolveTask($match_task);
 
+                    // It's very very possible that this target was added at the same time as another
+                    // If that was the case, we're going to keep the one with the highest duration and cut out the rest
+                    $subset_matches = $match_task->result->data->matches;
+                    $kept_media = $api_media_subset;
+                    $dropped_subsets = array();
+                    $subset_duration = $api_media_subset->duration;
+                    foreach($subset_matches as $subset_match)
+                    {
+                        $match_duration = $subset_match->duration;
+                        $subset_duration = $kept_media->duration;
+
+                        // Are they mutually overlapping clips?
+                        // TODO: this .7 has to map with a setting from DT5k too, that association shoudl be more explicit
+                        if($match_duration / $subset_duration > .7
+                        && $subset_duration / $match_duration > .7)
+                        {
+                            if($subset_duration > $match_duration)
+                            {
+                                $dropped_subsets[] = $subset_match;
+                            }
+                            else
+                            {
+                                $dropped_media[] = $kept_media;
+                                $kept_media = $subset_match;
+                            }
+                        }
+                    }
+
+                    foreach($dropped_subsets as $dropped_subset)
+                    {
+                        // Remove the potential target (it's a duplicate)
+                        $store_task = $matcher->startTask($dropped_subset, MatcherContract::TASK_REMOVE_POTENTIAL_TARGET);
+                        $store_task = $matcher->resolveTask($store_task);
+                    }
+
                     break;
             }
         }
