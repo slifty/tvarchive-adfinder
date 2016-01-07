@@ -118,15 +118,12 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
                     // If that was the case, we're going to keep the one with the highest duration and cut out the rest
                     $subset_matches = $match_task->result->data->matches->potential_targets;
                     $kept_media = $api_media_subset;
-                    $kept_id = $api_media_subset->id
                     $dropped_subsets = array();
                     $subset_duration = $api_media_subset->duration;
                     foreach($subset_matches as $subset_match)
                     {
                         $match_media = $subset_match->destination_media;
                         $overlap = $subset_match->duration;
-
-                        $kept_media->duration;
 
                         // Are they mutually overlapping clips?
                         // TODO: this .5 has to map with a setting from DT5k too, that association shoudl be more explicit
