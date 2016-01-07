@@ -116,7 +116,7 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
 
                     // It's very very possible that this target was added at the same time as another
                     // If that was the case, we're going to keep the one with the highest duration and cut out the rest
-                    $subset_matches = $match_task->result->data->matches;
+                    $subset_matches = $match_task->result->data->matches->potential_targets;
                     $kept_media = $api_media_subset;
                     $dropped_subsets = array();
                     $subset_duration = $api_media_subset->duration;
