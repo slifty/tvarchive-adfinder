@@ -118,26 +118,33 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
                     // If that was the case, we're going to keep the one with the highest duration and cut out the rest
                     $subset_matches = $match_task->result->data->matches->potential_targets;
                     $kept_media = $api_media_subset;
+                    $kept_id = $api_media_subset->id
                     $dropped_subsets = array();
                     $subset_duration = $api_media_subset->duration;
                     foreach($subset_matches as $subset_match)
                     {
-                        $match_duration = $subset_match->duration;
-                        $subset_duration = $kept_media->duration;
+                        $match_media = $subset_match->destination_media;
+                        $overlap = $subset_match->duration;
+
+                        $kept_media->duration;
 
                         // Are they mutually overlapping clips?
-                        // TODO: this .7 has to map with a setting from DT5k too, that association shoudl be more explicit
-                        if($match_duration / $subset_duration > .7
-                        && $subset_duration / $match_duration > .7)
+                        // TODO: this .5 has to map with a setting from DT5k too, that association shoudl be more explicit
+                        if($overlap / $match_media->duration > .5
+                        && $overlap / $kept_media->duration > .5)
                         {
-                            if($subset_duration > $match_duration)
+                            // Keep the longer one
+                            // Or, if they're equal lengths, keep the newest
+                            if($kept_media->duration > $match_media->duration
+                            || ($kept_media->duration == $match_media->duration
+                             && $kept_media->id > $match_media->id ))
                             {
-                                $dropped_subsets[] = $subset_match;
+                                $dropped_subsets[] = $match_media;
                             }
                             else
                             {
                                 $dropped_media[] = $kept_media;
-                                $kept_media = $subset_match;
+                                $kept_media = $match_media;
                             }
                         }
                     }
