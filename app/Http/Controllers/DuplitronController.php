@@ -254,7 +254,7 @@ class DuplitronController extends Controller {
 
         // TEMP TEST CODE
         //$ads = ['PolAd_HillaryClinton_psr4d'];
-
+        $ads = ['PolAd_BernieSanders_gd96c'];
         $ads = $this->packageMediaForIngestion($ads);
         return $ads;
     }

@@ -61,12 +61,12 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
         $register_task = $matcher->resolveTask($register_task);
 
         // Step 2: Deregister this as a potential target
-        $deregister_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_REMOVE_POTENTIAL_TARGET);
-        $deregister_task = $matcher->resolveTask($deregister_task);
+        // $deregister_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_REMOVE_POTENTIAL_TARGET);
+        // $deregister_task = $matcher->resolveTask($deregister_task);
 
         // Step 3: Deregister this as a distractor
-        $deregister_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_REMOVE_DISTRACTOR);
-        $deregister_task = $matcher->resolveTask($deregister_task);
+        // $deregister_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_REMOVE_DISTRACTOR);
+        // $deregister_task = $matcher->resolveTask($deregister_task);
 
         // Step 4: Run a match
         $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_FULL_MATCH);
@@ -76,35 +76,35 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
         if($match_task)
         {
             // Step 5: Remove any matched media in the potential targets list
-            $potential_targets = $match_task->result->data->matches->potential_targets;
-            foreach($potential_targets as $potential_target)
-            {
-                // Deregister the potential target
-                $matched_media = $potential_target->destination_media;
-                $deregister_task = $matcher->startTask($matched_media, MatcherContract::TASK_REMOVE_POTENTIAL_TARGET);
-                $deregister_task = $matcher->resolveTask($deregister_task);
-            }
+            // $potential_targets = $match_task->result->data->matches->potential_targets;
+            // foreach($potential_targets as $potential_target)
+            // {
+            //     // Deregister the potential target
+            //     $matched_media = $potential_target->destination_media;
+            //     $deregister_task = $matcher->startTask($matched_media, MatcherContract::TASK_REMOVE_POTENTIAL_TARGET);
+            //     $deregister_task = $matcher->resolveTask($deregister_task);
+            // }
 
             // Step 6: Remove any matched media in the distractors list
-            $distractors = $match_task->result->data->matches->distractors;
-            foreach($distractors as $distractor)
-            {
-                // Deregister the potential target
-                $matched_media = $distractor->destination_media;
-                $deregister_task = $matcher->startTask($matched_media, MatcherContract::TASK_REMOVE_DISTRACTOR);
-                $deregister_task = $matcher->resolveTask($deregister_task);
-            }
+            // $distractors = $match_task->result->data->matches->distractors;
+            // foreach($distractors as $distractor)
+            // {
+            //     // Deregister the potential target
+            //     $matched_media = $distractor->destination_media;
+            //     $deregister_task = $matcher->startTask($matched_media, MatcherContract::TASK_REMOVE_DISTRACTOR);
+            //     $deregister_task = $matcher->resolveTask($deregister_task);
+            // }
 
             // Step 7: Look for all instances of this among the corpus
-            $instances = $match_task->result->data->matches->corpus;
-            foreach($instances as $instance)
-            {
-                $start = $instance->destination_media->start;
-                $end = $start + $target->duration;
-                $canonical_id = $this->media->archive_id;
-                $instance_id = $target->destination_media->external_id;
-                $matcher->registerCanonicalInstance($canonical_id, $instance_id, $start, $end);
-            }
+            // $instances = $match_task->result->data->matches->corpus;
+            // foreach($instances as $instance)
+            // {
+            //     $start = $instance->destination_media->start;
+            //     $end = $start + $target->duration;
+            //     $canonical_id = $this->media->archive_id;
+            //     $instance_id = $target->destination_media->external_id;
+            //     $matcher->registerCanonicalInstance($canonical_id, $instance_id, $start, $end);
+            // }
         }
 
         // Mark this media as processed
