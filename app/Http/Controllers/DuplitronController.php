@@ -219,10 +219,15 @@ class DuplitronController extends Controller {
         // Get a list of recent identifiers
         $files = $http->get(env("ARCHIVE_API_HOST")."/details/tv?output=json&weekshows=1&audmonth=1");
 
-        // TEMP TEST CODE
-        //$files = ['WMUR_20151013_030000_News_9_Tonight'];
+        // We're going to cut out anything that's not from 2016, for now
+        $filtered_files = array();
+        foreach($files as $file)
+        {
+            if(strpos($file, '_2016') !==false)
+                $filtered_files[] = $file;
+        }
 
-        $files = $this->packageMediaForIngestion($files);
+        $files = $this->packageMediaForIngestion($filtered_files);
         return $files;
     }
 
