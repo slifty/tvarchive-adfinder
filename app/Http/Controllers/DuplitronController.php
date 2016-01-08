@@ -239,22 +239,34 @@ class DuplitronController extends Controller {
     {
         // Get a list of ad instances from the archive
         // TODO: this should be done completely differently (ideally with a designated endpoint, not a random solr search)
-        $url = env('ARCHIVE_SEARCH_HOST').'/solr/select?indent=yes&omitHeader=true&wt=json&&q=*%3A*&rows=0&facet=on&facet.field=ad_id';
-        $result = $http->get($url);
+        $url = env('ARCHIVE_API_HOST').'/details/tv?output=json&canonical_ads';
+        $full_ads = $http->get($url);
 
-        // The result has a list of ad ids and counts
-        $facets = $result->facet_counts->facet_fields->ad_id;
+        // Temporary -- we want to strip out ads for the PA 2014 elections
         $ads = array();
-        foreach($facets as $facet) {
-            // is this NOT a count?
-            if(!is_numeric($facet)) {
-                $ads[] = $facet;
-            }
+        foreach($full_ads as $ad)
+        {
+            if(strpos($ad, 'TomCorbett') === false
+            && strpos($ad, 'TomWolf') === false
+            && strpos($ad, 'TomMcgarrigle') === false
+            && strpos($ad, 'MikeFitzpatrick') === false
+            && strpos($ad, 'AimeeBelgard') === false
+            && strpos($ad, 'DonaldNorcross') === false
+            && strpos($ad, 'ChrisCoons') === false
+            && strpos($ad, 'JohnKane') === false
+            && strpos($ad, 'FrankLobiondo') === false
+            && strpos($ad, 'HeatherSimmons') === false
+            && strpos($ad, 'MananTrivedi') === false
+            && strpos($ad, 'MikeSchmidt') === false
+            && strpos($ad, 'MarioScavello') === false
+            && strpos($ad, 'RyanCostello') === false
+            && strpos($ad, 'TomMacarthur') === false
+            && strpos($ad, 'TommyTomlinson') === false
+            && strpos($ad, 'TomQuigley') === false
+            && strpos($ad, 'WarrenKampf') === false)
+                $ads[] = $ad;
         }
 
-        // TEMP TEST CODE
-        //$ads = ['PolAd_HillaryClinton_psr4d'];
-        $ads = ['PolAd_BernieSanders_gd96c'];
         $ads = $this->packageMediaForIngestion($ads);
         return $ads;
     }

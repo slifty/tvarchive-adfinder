@@ -70,6 +70,8 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
 
         // Step 4: Run a match
         $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_FULL_MATCH);
+        // $match_task = new \stdClass();
+        // $match_task->id = 18342;
         $match_task = $matcher->resolveTask($match_task);
 
         // Before moving forward, make sure we got data back
@@ -96,15 +98,19 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
             // }
 
             // Step 7: Look for all instances of this among the corpus
-            // $instances = $match_task->result->data->matches->corpus;
-            // foreach($instances as $instance)
-            // {
-            //     $start = $instance->destination_media->start;
-            //     $end = $start + $target->duration;
-            //     $canonical_id = $this->media->archive_id;
-            //     $instance_id = $target->destination_media->external_id;
-            //     $matcher->registerCanonicalInstance($canonical_id, $instance_id, $start, $end);
-            // }
+            $instances = $match_task->result->data->matches->corpus;
+            foreach($instances as $instance)
+            {
+                // Skip matches that are too short
+                if($instance->duration < 8)
+                    continue;
+
+                $start = $instance->target_start;
+                $end = $start + $instance->duration;
+                $canonical_id = $this->media->archive_id;
+                $instance_id = $instance->destination_media->external_id;
+                $matcher->registerCanonicalInstance($canonical_id, $instance_id, $start, $end);
+            }
         }
 
         // Mark this media as processed
