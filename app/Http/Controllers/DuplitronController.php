@@ -234,7 +234,7 @@ class DuplitronController extends Controller {
     {
         // Get a list of recent identifiers
         $files = $http->get(env("ARCHIVE_API_HOST")."/details/tv?output=json&weekshows=1&audmonth=1");
-        $files = $this->packageMediaForIngestion($filtered_files);
+        $files = $this->packageMediaForIngestion($files);
         return $files;
     }
 
