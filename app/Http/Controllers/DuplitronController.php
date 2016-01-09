@@ -177,15 +177,15 @@ class DuplitronController extends Controller {
      * @param  [type] $duplitron_id [description]
      * @return [type]               [description]
      */
-    private function getOrCreateMedia($id)
+    private function getOrCreateMedia($duplitron_id)
     {
-        $media = Media::where('duplitron_id', $id)->get()->pop();
+        $media = Media::where('duplitron_id', $duplitron_id)->get()->pop();
 
         // If the media doesn't exist, make it
         if(!$media)
         {
             $media = new Media();
-            $media->duplitron_id = $id;
+            $media->duplitron_id = $duplitron_id;
         }
         $media->save();
 
@@ -194,18 +194,18 @@ class DuplitronController extends Controller {
 
     /**
      * Finds (or creates) media object from a duplitron ID
-     * @param  [type] $duplitron_id [description]
+     * @param  [type] $external_id [description]
      * @return [type]               [description]
      */
-    private function getOrCreateMediaByExternalId($external)
+    private function getOrCreateMediaByExternalId($external_id)
     {
-        $media = Media::where('external_id', $id)->get()->pop();
+        $media = Media::where('external_id', $external_id)->get()->pop();
 
         // If the media doesn't exist, make it
         if(!$media)
         {
             $media = new Media();
-            $media->external_id = $id;
+            $media->external_id = $external_id;
         }
         $media->save();
         return $media;
