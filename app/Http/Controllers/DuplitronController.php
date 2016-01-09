@@ -27,7 +27,7 @@ class DuplitronController extends Controller {
         foreach($ad_list as $input_media)
         {
             // Skip items that have already been processed
-            $media = $this->getOrCreateMediaByExternalId($input_media['external_id']);
+            $media = $this->getOrCreateMediaByArchiveId($input_media['external_id']);
             $media->archive_id = $input_media['external_id'];
             $media->media_path = $input_media['media_path'];
             $media->afpt_path = $input_media['afpt_path'];
@@ -194,18 +194,18 @@ class DuplitronController extends Controller {
 
     /**
      * Finds (or creates) media object from a duplitron ID
-     * @param  [type] $external_id [description]
+     * @param  [type] $archive_id [description]
      * @return [type]               [description]
      */
-    private function getOrCreateMediaByExternalId($external_id)
+    private function getOrCreateMediaByArchiveId($archive_id)
     {
-        $media = Media::where('external_id', $external_id)->get()->pop();
+        $media = Media::where('archive_id', $archive_id)->get()->pop();
 
         // If the media doesn't exist, make it
         if(!$media)
         {
             $media = new Media();
-            $media->external_id = $external_id;
+            $media->archive_id = $archive_id;
         }
         $media->save();
         return $media;
