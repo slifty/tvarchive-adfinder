@@ -121,7 +121,7 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
                 $end = $start + $instance->duration;
                 $canonical_id = $this->media->archive_id;
                 $instance_id = $instance->destination_media->external_id;
-                $matcher->registerCanonicalInstance($canonical_id, $instance_id, $start, $end)
+                $matcher->registerCanonicalInstance($canonical_id, $instance_id, $start, $end);
             }
         }
 
