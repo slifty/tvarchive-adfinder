@@ -70,8 +70,6 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
 
         // Step 4: Run a match
         $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_FULL_MATCH);
-        // $match_task = new \stdClass();
-        // $match_task->id = 18342;
         $match_task = $matcher->resolveTask($match_task);
 
         // Before moving forward, make sure we got data back
@@ -99,6 +97,20 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
 
             // Step 7: Look for all instances of this among the corpus
             $instances = $match_task->result->data->matches->corpus;
+
+            // Sort them in order of start time
+            // NOTE: right now there is a known bug where audfprint will sometimes have TWO copies of an ad, split up!
+            // My inserting in order we will passively drop the duplicate due to overlap on backend
+            // Eventually we should make the matches more accurate *and* handle overlap on frontend.
+            $target_start_sort = function($a, $b)
+            {
+                if($a->target_start < $b->target_start)
+                    return -1;
+                if($a->target_start > $b->target_start)
+                    return 1;
+                return 0;
+            };
+
             foreach($instances as $instance)
             {
                 // Skip matches that are too short
@@ -109,7 +121,6 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
                 $end = $start + $instance->duration;
                 $canonical_id = $this->media->archive_id;
                 $instance_id = $instance->destination_media->external_id;
-                $matcher->registerCanonicalInstance($canonical_id, $instance_id, $start, $end);
             }
         }
 
