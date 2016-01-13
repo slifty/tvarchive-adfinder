@@ -28,7 +28,7 @@ class Kernel extends ConsoleKernel
                  ->hourly();
 
         $schedule->call('AdFinder\Http\Controllers\DuplitronController@runMatchJob')
-                 ->everyFiveMinutes()
+                 ->everyThirtyMinutes()
                  ->name("runMatchJob")
                  ->withoutOverlapping();
 
