@@ -235,10 +235,7 @@ class DuplitronController extends Controller {
     private function getNewMedia(HttpContract $http)
     {
         // Get a list of recent identifiers
-        //$files = $http->get(env("ARCHIVE_API_HOST")."/details/tv?output=json&weekshows=1&audmonth=1");
-
-        // Temporary
-        $files = array('FOXNEWSW_20160104_110000_FOX__Friends');
+        $files = $http->get(env("ARCHIVE_API_HOST")."/details/tv?output=json&weekshows=1&audmonth=1");
         $files = $this->packageMediaForIngestion($files);
         return $files;
     }
