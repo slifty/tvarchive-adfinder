@@ -26,5 +26,11 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('inspire')
                  ->hourly();
+
+        $schedule->call('AdFinder\Http\Controllers\DuplitronController@runMatchJob')
+                 ->hourly()
+                 ->name("runMatchJob")
+                 ->withoutOverlapping();
+
     }
 }

@@ -8,6 +8,7 @@ interface MatcherContract
     // Task Types
     const TASK_MATCH = "match";
     const TASK_FULL_MATCH = "full_match";
+    const TASK_MATCH_TARGETS = "match_targets";
     const TASK_ADD_CORPUS = "corpus_add";
     const TASK_ADD_POTENTIAL_TARGET = "potential_target_add";
     const TASK_ADD_DISTRACTOR = "distractor_add";

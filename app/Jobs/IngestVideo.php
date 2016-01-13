@@ -61,19 +61,38 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
             return;
         }
 
+        // Match against targets
+        $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_MATCH_TARGETS);
+        $match_task = $matcher->resolveTask($match_task);
+
         // Run the match command
         // $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_MATCH);
-
-        // // Wait for the match to finish
         // $match_task = $matcher->resolveTask($match_task);
 
-        // // If the task failed, move along
-        // if($match_task->status->code == MatcherContract::STATUS_FAILED)
-        // {
-        //     $this->media->status = Media::STATUS_FAILED;
-        //     $this->media->save();
-        //     return;
-        // }
+        // If the task failed, move along
+        if($match_task->status->code == MatcherContract::STATUS_FAILED)
+        {
+            $this->media->status = Media::STATUS_FAILED;
+            $this->media->save();
+            return;
+        }
+
+        // Get the list of target matches
+        $matches = $match_task->result->data->matches;
+        $targets = $matches->targets;
+
+        // Register the targets
+        foreach($targets as $target)
+        {
+            // Skip matches that are too short
+            if($target->duration < 8)
+                continue;
+            $start = $target->start;
+            $end = $target->start + $target->duration;
+            $instance_id = $this->media->archive_id;
+            $canonical_id = $target->destination_media->external_id;
+            $matcher->registerCanonicalInstance($canonical_id, $instance_id, $start, $end);
+        }
 
         // // Pull out the pieces we will care about
         // $matches = $match_task->result->data->matches;

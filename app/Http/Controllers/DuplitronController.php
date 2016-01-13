@@ -27,6 +27,8 @@ class DuplitronController extends Controller {
         foreach($ad_list as $input_media)
         {
             // Skip items that have already been processed
+            // if($this->isAlreadyProcessed($input_media['external_id']))
+            //     continue;
             $media = $this->getOrCreateMediaByArchiveId($input_media['external_id']);
             $media->archive_id = $input_media['external_id'];
             $media->media_path = $input_media['media_path'];
@@ -233,7 +235,10 @@ class DuplitronController extends Controller {
     private function getNewMedia(HttpContract $http)
     {
         // Get a list of recent identifiers
-        $files = $http->get(env("ARCHIVE_API_HOST")."/details/tv?output=json&weekshows=1&audmonth=1");
+        //$files = $http->get(env("ARCHIVE_API_HOST")."/details/tv?output=json&weekshows=1&audmonth=1");
+
+        // Temporary
+        $files = array('FOXNEWSW_20160104_110000_FOX__Friends');
         $files = $this->packageMediaForIngestion($files);
         return $files;
     }
