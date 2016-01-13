@@ -57,8 +57,11 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
         $this->media->save();
 
         // Step 1: Register this as a target
-        $register_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_ADD_TARGET);
-        $register_task = $matcher->resolveTask($register_task);
+        // ... unless it is already a target
+        if(!$duplitron_media->match_categorization->is_target) {
+            $register_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_ADD_TARGET);
+            $register_task = $matcher->resolveTask($register_task);
+        }
 
         // Step 2: Deregister this as a potential target
         // $deregister_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_REMOVE_POTENTIAL_TARGET);

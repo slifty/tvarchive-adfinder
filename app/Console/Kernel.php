@@ -32,5 +32,10 @@ class Kernel extends ConsoleKernel
                  ->name("runMatchJob")
                  ->withoutOverlapping();
 
+        $schedule->call('AdFinder\Http\Controllers\DuplitronController@runTargetJob')
+                 ->dailyAt('1:00')
+                 ->name("runTargetJob")
+                 ->withoutOverlapping();
+
     }
 }

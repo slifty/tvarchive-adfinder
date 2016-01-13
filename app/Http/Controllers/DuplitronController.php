@@ -27,8 +27,12 @@ class DuplitronController extends Controller {
         foreach($ad_list as $input_media)
         {
             // Skip items that have already been processed
-            // if($this->isAlreadyProcessed($input_media['external_id']))
-            //     continue;
+            // Unless they are marked as failed
+            if($this->isAlreadyProcessed($input_media['external_id'])) {
+                $media = $this->getOrCreateMediaByArchiveId($input_media['external_id']);
+                if($media->status != Media::STATUS_FAILED)
+                    continue;
+            }
             $media = $this->getOrCreateMediaByArchiveId($input_media['external_id']);
             $media->archive_id = $input_media['external_id'];
             $media->media_path = $input_media['media_path'];
