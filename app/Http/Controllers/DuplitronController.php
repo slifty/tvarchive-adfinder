@@ -294,8 +294,8 @@ class DuplitronController extends Controller {
         // Create a media item for each file in the list
         array_walk($files, function(&$item, $key) {
             $item = [
-                "media_path" => "http://archive.org/download/".$item."/format=MP3",
-                "afpt_path" => "http://archive.org/compress/".$item."/formats=COLUMBIA%20SPARSE%20FINGERPRINT%20TV&file=/".$item.".zip",
+                "media_path" => "https://archive.org/download/".$item."/format=MP3",
+                "afpt_path" => "https://archive.org/compress/".$item."/formats=COLUMBIA%20SPARSE%20FINGERPRINT%20TV&file=/".$item.".zip",
                 "external_id" => $item
             ];
         });

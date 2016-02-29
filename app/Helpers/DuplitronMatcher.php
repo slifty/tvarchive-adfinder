@@ -95,7 +95,7 @@ class DuplitronMatcher implements MatcherContract
     {
 
         // Set up the API call to look at our project
-        $url = env('DUPLITRON_URL')."/tasks?project_id=".env('DUPLITRON_PROJECT_ID');
+        $url = env('DUPLITRON_URL')."/media_tasks?project_id=".env('DUPLITRON_PROJECT_ID');
 
         // Add any type filters
         switch($status_type)
@@ -151,7 +151,7 @@ class DuplitronMatcher implements MatcherContract
             "type" => $type
         ];
 
-        $url = env('DUPLITRON_URL')."/tasks";
+        $url = env('DUPLITRON_URL')."/media_tasks";
         // Run the call
         $api_task = $this->http->post($url, $task_api_data);
 
@@ -164,7 +164,7 @@ class DuplitronMatcher implements MatcherContract
     public function getTask($task)
     {
         // Populate the data
-        $url = env('DUPLITRON_URL')."/tasks/".$task->id;
+        $url = env('DUPLITRON_URL')."/media_tasks/".$task->id;
 
         // Run the call
         $api_task = $this->http->get($url);
