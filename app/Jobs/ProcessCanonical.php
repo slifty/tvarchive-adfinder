@@ -78,32 +78,13 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
         // Before moving forward, make sure we got data back
         if($match_task)
         {
-            // Step 5: Remove any matched media in the potential targets list
-            // $potential_targets = $match_task->result->data->matches->potential_targets;
-            // foreach($potential_targets as $potential_target)
-            // {
-            //     // Deregister the potential target
-            //     $matched_media = $potential_target->destination_media;
-            //     $deregister_task = $matcher->startTask($matched_media, MatcherContract::TASK_REMOVE_POTENTIAL_TARGET);
-            //     $deregister_task = $matcher->resolveTask($deregister_task);
-            // }
 
-            // Step 6: Remove any matched media in the distractors list
-            // $distractors = $match_task->result->data->matches->distractors;
-            // foreach($distractors as $distractor)
-            // {
-            //     // Deregister the potential target
-            //     $matched_media = $distractor->destination_media;
-            //     $deregister_task = $matcher->startTask($matched_media, MatcherContract::TASK_REMOVE_DISTRACTOR);
-            //     $deregister_task = $matcher->resolveTask($deregister_task);
-            // }
-
-            // Step 7: Look for all instances of this among the corpus
+            // Step 5: Look for all instances of this among the corpus
             $instances = $match_task->result->data->matches->corpus;
 
             // Sort them in order of start time
             // NOTE: right now there is a known bug where audfprint will sometimes have TWO copies of an ad, split up!
-            // My inserting in order we will passively drop the duplicate due to overlap on backend
+            // By inserting in order we will passively drop the duplicate due to overlap on backend
             // Eventually we should make the matches more accurate *and* handle overlap on frontend.
             $target_start_sort = function($a, $b)
             {
@@ -117,7 +98,16 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
             foreach($instances as $instance)
             {
                 // Skip matches that are too short
-                if($instance->duration < 8)
+                if($instance->duration < env('DUPLITRON_MIN_DURATION'))
+                    continue;
+
+                // Skip matches that are too long
+                if($instance->duration < env('DUPLITRON_MAX_DURATION'))
+                    continue;
+
+                // Skip matches with a confidence level that is too low
+                $confidence = $instance->consecutive_hashes / $instance->duration;
+                if($confidence < env('DUPLITRON_MIN_CONFIDENCE'))
                     continue;
 
                 $start = $instance->target_start;

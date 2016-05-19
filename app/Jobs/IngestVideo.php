@@ -85,113 +85,24 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
         foreach($targets as $target)
         {
             // Skip matches that are too short
-            if($target->duration < 8)
+            if($target->duration < env('DUPLITRON_MIN_DURATION'))
                 continue;
+
+            // Skip matches that are too long
+            if($target->duration < env('DUPLITRON_MAX_DURATION'))
+                continue;
+
+            // Skip matches with a confidence level that is too low
+            $confidence = $target->consecutive_hashes / $target->duration;
+            if($confidence < env('DUPLITRON_MIN_CONFIDENCE'))
+                continue;
+
             $start = $target->start;
             $end = $target->start + $target->duration;
             $instance_id = $this->media->archive_id;
             $canonical_id = $target->destination_media->external_id;
             $matcher->registerCanonicalInstance($canonical_id, $instance_id, $start, $end);
         }
-
-        // // Pull out the pieces we will care about
-        // $matches = $match_task->result->data->matches;
-        // $segments = $match_task->result->data->segments;
-
-        // // Iterate through the matched segments
-        // foreach($segments as $segment)
-        // {
-        //     // Cut out segments that don't fit our bounds
-        //     $duration = $segment->duration;
-
-        //     if($duration < env('DUPLITRON_MIN_DURATION')
-        //     || $duration > env('DUPLITRON_MAX_DURATION'))
-        //         continue;
-
-        //     switch($segment->type)
-        //     {
-        //         case 'distractor':
-        //             // Skip distractors
-        //             break;
-        //         case 'potential_target':
-        //             // Skip potential targets
-        //             break;
-        //         case 'target':
-        //             // We care about these segments, but register them in the matches loop
-        //             break;
-        //         case 'corpus':
-
-        //             // TODO: this ought to be handled in a separate job
-        //             // Create a new media segment for the corpus match
-        //             $api_media_subset = $matcher->addMediaSubset($duplitron_media, $segment->start, $segment->duration);
-
-        //             // Register the segment as a new potential target
-        //             $store_task = $matcher->startTask($api_media_subset, MatcherContract::TASK_ADD_POTENTIAL_TARGET);
-        //             $store_task = $matcher->resolveTask($store_task);
-
-        //             // Run a match to populate the match data for the potential target
-        //             $match_task = $matcher->startTask($api_media_subset, MatcherContract::TASK_MATCH);
-        //             $match_task = $matcher->resolveTask($match_task);
-
-        //             // It's very very possible that this target was added at the same time as another
-        //             // If that was the case, we're going to keep the one with the highest duration and cut out the rest
-        //             $subset_matches = $match_task->result->data->matches->potential_targets;
-        //             $kept_media = $api_media_subset;
-        //             $dropped_subsets = array();
-        //             $subset_duration = $api_media_subset->duration;
-        //             foreach($subset_matches as $subset_match)
-        //             {
-        //                 $match_media = $subset_match->destination_media;
-        //                 $overlap = $subset_match->duration;
-
-        //                 // Are they mutually overlapping clips?
-        //                 // TODO: this .5 has to map with a setting from DT5k too, that association shoudl be more explicit
-        //                 if($overlap / $match_media->duration > .5
-        //                 && $overlap / $kept_media->duration > .5)
-        //                 {
-        //                     // Keep the longer one
-        //                     // Or, if they're equal lengths, keep the newest
-        //                     if($kept_media->duration > $match_media->duration
-        //                     || ($kept_media->duration == $match_media->duration
-        //                      && $kept_media->id > $match_media->id ))
-        //                     {
-        //                         $dropped_subsets[] = $match_media;
-        //                     }
-        //                     else
-        //                     {
-        //                         $dropped_media[] = $kept_media;
-        //                         $kept_media = $match_media;
-        //                     }
-        //                 }
-        //             }
-
-        //             foreach($dropped_subsets as $dropped_subset)
-        //             {
-        //                 // Remove the potential target (it's a duplicate)
-        //                 $store_task = $matcher->startTask($dropped_subset, MatcherContract::TASK_REMOVE_POTENTIAL_TARGET);
-        //                 $store_task = $matcher->resolveTask($store_task);
-        //             }
-
-        //             break;
-        //     }
-        // }
-
-        // // Iterate through the target matches and register them
-        // $targets = $matches->targets;
-        // foreach($targets as $target)
-        // {
-        //     $start = $target->start;
-        //     $end = $target->start + $target->duration;
-        //     $instance_id = $this->media->archive_id;
-        //     $canonical_id = $target->destination_media->external_id;
-        //     $matcher->registerCanonicalInstance($canonical_id, $instance_id, $start, $end);
-
-        // }
-
-        // Clean up after yourself
-        // Disabled temporarily...
-        // $clean_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_CLEAN);
-        // $clean_task = $matcher->resolveTask($clean_task);
 
         // Mark this media as processed
         $this->media->status = Media::STATUS_STABLE;
