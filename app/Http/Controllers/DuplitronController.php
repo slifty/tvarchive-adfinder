@@ -291,6 +291,9 @@ class DuplitronController extends Controller {
      */
     private function packageMediaForIngestion($files) {
 
+        if(!is_array($files))
+            return array();
+
         // Create a media item for each file in the list
         array_walk($files, function(&$item, $key) {
             $item = [
