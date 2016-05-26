@@ -106,8 +106,8 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
                     continue;
 
                 // Skip matches with a confidence level that is too low
-                $confidence = $instance->consecutive_hashes / $instance->duration;
-                if($confidence < env('DUPLITRON_MIN_CONFIDENCE'))
+                $confidence = $instance->consecutive_hashes / $instance->total_hashes;
+                if($confidence < env('DUPLITRON_MIN_HASH_RATIO'))
                     continue;
 
                 $start = $instance->target_start;
