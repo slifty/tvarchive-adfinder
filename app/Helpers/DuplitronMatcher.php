@@ -3,6 +3,7 @@
 namespace AdFinder\Helpers;
 
 use AdFinder\Helpers\Contracts\MatcherContract;
+use Log;
 
 class DuplitronMatcher implements MatcherContract
 {
@@ -211,9 +212,12 @@ class DuplitronMatcher implements MatcherContract
         if($canonical_id == "" || $instance_id == "")
             return;
 
-        $segment_url = "https://archive.org/details/".$instance_id."#start/".$start."/end/".$end;
-        $register_instance_url = env("ARCHIVE_API_HOST")."/details/tv?another_ad=1&output=json&url=".urlencode($segment_url)."&ad_id=".urlencode($canonical_id);
-        return $this->http->get($register_instance_url);
+        Log::info("New instance: ".$canonical_id.", ".$instance_id." - ".$start." to ".$end);
+        if(env('REGISTER_RESULTS_WITH_ARCHIVE') == "true") {
+            $segment_url = "https://archive.org/details/".$instance_id."#start/".$start."/end/".$end;
+            $register_instance_url = env("ARCHIVE_API_HOST")."/details/tv?another_ad=1&output=json&url=".urlencode($segment_url)."&ad_id=".urlencode($canonical_id);
+            return $this->http->get($register_instance_url);
+        }
     }
 
 }
