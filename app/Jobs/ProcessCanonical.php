@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use AdFinder\Media;
 
 use AdFinder\Helpers\Contracts\MatcherContract;
+use Log;
 
 class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
 {
@@ -46,6 +47,8 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
             $this->media->duplitron_id = $duplitron_media->id;
             $this->media->save();
         }
+
+        Log::info("Starting to process: ".$this->media->duplitron_id;
 
         // Load the latest duplitron media
         $duplitron_media = $matcher->getMedia($this->media->duplitron_id);
