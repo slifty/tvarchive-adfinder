@@ -45,21 +45,21 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
         $this->media->duplitron_id = $duplitron_media->id;
         $this->media->save();
 
-        // Skip any media that is already in the corpus
-        if($duplitron_media->match_categorization->is_corpus)
-            return;
+        // If it's not in the corpus, add it
+        if(!$duplitron_media->match_categorization->is_corpus) {
+            $corpus_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_ADD_CORPUS);
+            $matcher->resolveTask($corpus_task);
+
+            if($corpus_task->status->code == MatcherContract::STATUS_FAILED)
+            {
+                $this->media->status = Media::STATUS_FAILED;
+                $this->media->save();
+                return;
+            }
+        }
 
         // Add media to the corpus
         // This needs to be done before matching to ensure no comparisons are missed in multithreaded environments
-        $corpus_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_ADD_CORPUS);
-        $matcher->resolveTask($corpus_task);
-
-        if($corpus_task->status->code == MatcherContract::STATUS_FAILED)
-        {
-            $this->media->status = Media::STATUS_FAILED;
-            $this->media->save();
-            return;
-        }
 
         // Match against targets
         $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_MATCH_TARGETS);
