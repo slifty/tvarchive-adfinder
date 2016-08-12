@@ -89,11 +89,11 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
                 continue;
 
             // Skip matches that are too long
-            if($target->duration < env('DUPLITRON_MAX_DURATION'))
+            if($target->duration > env('DUPLITRON_MAX_DURATION'))
                 continue;
 
             // Skip matches with a confidence level that is too low
-            $confidence = $target->consecutive_hashes / $target->total_hashes;
+            $confidence = $target->consecutive_hashes / $target->common_hashes;
             if($confidence < env('DUPLITRON_MIN_HASH_RATIO'))
                 continue;
 

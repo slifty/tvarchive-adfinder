@@ -105,7 +105,7 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
                     continue;
 
                 // Skip matches that are too long
-                if($instance->duration < env('DUPLITRON_MAX_DURATION'))
+                if($instance->duration > env('DUPLITRON_MAX_DURATION'))
                     continue;
 
                 // Skip matches with a confidence level that is too low
