@@ -48,7 +48,7 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
             $this->media->save();
         }
 
-        Log::info("Starting to process: ".$this->media->duplitron_id;
+        Log::info("Starting to process: ".$this->media->duplitron_id);
 
         // Load the latest duplitron media
         $duplitron_media = $matcher->getMedia($this->media->duplitron_id);
