@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use AdFinder\Media;
 
 use AdFinder\Helpers\Contracts\MatcherContract;
+use Log;
 
 class IngestVideo extends Job implements SelfHandling, ShouldQueue
 {
