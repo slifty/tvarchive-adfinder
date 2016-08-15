@@ -58,6 +58,8 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
             }
         }
 
+        Log::info("Starting to process: ".$this->media->duplitron_id);
+
         // Add media to the corpus
         // This needs to be done before matching to ensure no comparisons are missed in multithreaded environments
 
