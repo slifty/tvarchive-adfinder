@@ -239,10 +239,10 @@ class DuplitronController extends Controller {
     private function getNewMedia(HttpContract $http)
     {
         // We only want shows from the past 2 months (for scalability)
-        $current_month = date('Y-m', strtotime('-2 months'));
+        $current_month = date('Y-m', strtotime('-1 months'));
 
         // Get a list of recent identifiers
-        $files = $http->get(env("ARCHIVE_API_HOST")."/details/tv?output=json&weekshows=1&audmonth=".$current_month."&months=3");
+        $files = $http->get(env("ARCHIVE_API_HOST")."/details/tv?output=json&weekshows=1&audmonth=".$current_month."&months=2");
         $files = $this->packageMediaForIngestion($files);
 
         return $files;
