@@ -9,7 +9,6 @@ class DuplitronMatcher implements MatcherContract
 {
     private $http;
 
-
     // TODO: CurlHttp sohuld be HttpContract
     function __construct(CurlHttp $http)
     {
@@ -144,13 +143,15 @@ class DuplitronMatcher implements MatcherContract
     /**
      * See contract for documentation
      */
-    public function startTask($api_media, $type)
+    public function startTask($api_media, $type, $parameters = array())
     {
         // Populate the data
         $task_api_data = [
             "media_id" => $api_media->id,
             "type" => $type
         ];
+
+        $task_api_data = array_merge($task_api_data, $parameters);
 
         $url = env('DUPLITRON_URL')."/media_tasks";
         // Run the call

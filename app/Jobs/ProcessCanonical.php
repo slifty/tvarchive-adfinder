@@ -75,7 +75,11 @@ class ProcessCanonical extends Job implements SelfHandling, ShouldQueue
         // $deregister_task = $matcher->resolveTask($deregister_task);
 
         // Step 4: Run a match
-        $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_FULL_MATCH);
+        $parameters = array(
+            "end_date" => "2016-11-08",
+            "start_date" => "2016-10-01"
+        );
+        $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_FULL_MATCH, $parameters);
         $match_task = $matcher->resolveTask($match_task);
 
         // Before moving forward, make sure we got data back
