@@ -65,46 +65,50 @@ class IngestVideo extends Job implements SelfHandling, ShouldQueue
         // This needs to be done before matching to ensure no comparisons are missed in multithreaded environments
 
         // Match against targets
-        $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_MATCH_TARGETS);
-        $match_task = $matcher->resolveTask($match_task);
+        // Programs after election day should not be compared to past programs
+        $id_parts = explode($this->media->archive_id);
+        if((int)$id_parts[1] <= 20161108) {
+            $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_MATCH_TARGETS);
+            $match_task = $matcher->resolveTask($match_task);
 
-        // Run the match command
-        // $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_MATCH);
-        // $match_task = $matcher->resolveTask($match_task);
+            // Run the match command
+            // $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_MATCH);
+            // $match_task = $matcher->resolveTask($match_task);
 
-        // If the task failed, move along
-        if($match_task->status->code == MatcherContract::STATUS_FAILED)
-        {
-            $this->media->status = Media::STATUS_FAILED;
-            $this->media->save();
-            return;
-        }
+            // If the task failed, move along
+            if($match_task->status->code == MatcherContract::STATUS_FAILED)
+            {
+                $this->media->status = Media::STATUS_FAILED;
+                $this->media->save();
+                return;
+            }
 
-        // Get the list of target matches
-        $matches = $match_task->result->data->matches;
-        $targets = $matches->targets;
+            // Get the list of target matches
+            $matches = $match_task->result->data->matches;
+            $targets = $matches->targets;
 
-        // Register the targets
-        foreach($targets as $target)
-        {
-            // Skip matches that are too short
-            if($target->duration < env('DUPLITRON_MIN_DURATION'))
-                continue;
+            // Register the targets
+            foreach($targets as $target)
+            {
+                // Skip matches that are too short
+                if($target->duration < env('DUPLITRON_MIN_DURATION'))
+                    continue;
 
-            // Skip matches that are too long
-            if($target->duration > env('DUPLITRON_MAX_DURATION'))
-                continue;
+                // Skip matches that are too long
+                if($target->duration > env('DUPLITRON_MAX_DURATION'))
+                    continue;
 
-            // Skip matches with a confidence level that is too low
-            $confidence = $target->consecutive_hashes / $target->common_hashes;
-            if($confidence < env('DUPLITRON_MIN_HASH_RATIO'))
-                continue;
+                // Skip matches with a confidence level that is too low
+                $confidence = $target->consecutive_hashes / $target->common_hashes;
+                if($confidence < env('DUPLITRON_MIN_HASH_RATIO'))
+                    continue;
 
-            $start = $target->start;
-            $end = $target->start + $target->duration;
-            $instance_id = $this->media->archive_id;
-            $canonical_id = $target->destination_media->external_id;
-            $matcher->registerCanonicalInstance($canonical_id, $instance_id, $start, $end);
+                $start = $target->start;
+                $end = $target->start + $target->duration;
+                $instance_id = $this->media->archive_id;
+                $canonical_id = $target->destination_media->external_id;
+                $matcher->registerCanonicalInstance($canonical_id, $instance_id, $start, $end);
+            }
         }
 
         // Mark this media as processed
