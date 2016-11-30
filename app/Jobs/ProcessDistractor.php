@@ -55,29 +55,25 @@ class ProcessDistractor extends Job implements SelfHandling, ShouldQueue
         $deregister_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_REMOVE_POTENTIAL_TARGET);
         $deregister_task = $matcher->resolveTask($deregister_task);
 
-        // Programs after election day should not be compared to past programs
-        $id_parts = explode($this->media->archive_id);
-        if((int)$id_parts[1] <= 20161108) {
-            // Step 3: Run a match
-            $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_MATCH);
-            $match_task = $matcher->resolveTask($match_task);
+        // Step 3: Run a match
+        $match_task = $matcher->startTask($duplitron_media, MatcherContract::TASK_MATCH);
+        $match_task = $matcher->resolveTask($match_task);
 
-            // Step 4: Remove any matched media in the potential targets list
-            $potential_targets = $match_task->result->data->matches->potential_targets;
-            foreach($potential_targets as $potential_target)
-            {
-                // Deregister the potential target
-                $matched_media = $potential_target->destination_media;
+        // Step 4: Remove any matched media in the potential targets list
+        $potential_targets = $match_task->result->data->matches->potential_targets;
+        foreach($potential_targets as $potential_target)
+        {
+            // Deregister the potential target
+            $matched_media = $potential_target->destination_media;
 
-                // First make sure the match is significant
-                $match_duration = $potential_target->duration;
-                $matched_media_duration = $matched_media->duration;
-                if($match_duration / $matched_media_duration < .6)
-                    continue;
+            // First make sure the match is significant
+            $match_duration = $potential_target->duration;
+            $matched_media_duration = $matched_media->duration;
+            if($match_duration / $matched_media_duration < .6)
+                continue;
 
-                $deregister_task = $matcher->startTask($matched_media, MatcherContract::TASK_REMOVE_POTENTIAL_TARGET);
-                $deregister_task = $matcher->resolveTask($deregister_task);
-            }
+            $deregister_task = $matcher->startTask($matched_media, MatcherContract::TASK_REMOVE_POTENTIAL_TARGET);
+            $deregister_task = $matcher->resolveTask($deregister_task);
         }
 
         // Mark this media as processed
